@@ -5,23 +5,31 @@ FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
 
 WORKDIR /app
 
+# Non-root user for runtime
+RUN groupadd --system app && useradd --system --gid app --home /app --shell /usr/sbin/nologin app
+
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
 COPY app.py xsd.py ./
 COPY assets ./assets
 COPY examples ./examples
-# Schema registry — part of the image for Cloud Run / simple deploys
 COPY XSD ./XSD
 
 ARG GIT_COMMIT_COUNT=0
-RUN echo "0.2.${GIT_COMMIT_COUNT}" > /app/VERSION
+RUN echo "0.2.${GIT_COMMIT_COUNT}" > /app/VERSION \
+    && chown -R app:app /app
 
 ENV XSD_DIR=/app/XSD
 ENV PORT=8080
 ENV PATH="/app/.venv/bin:$PATH"
+# Limit request body (must match app MAX_XML_BYTES headroom)
+ENV MAX_XML_BYTES=10485760
 
-# Cloud Run injects PORT (default 8080); local scripts can set 8030
+USER app
+
 EXPOSE 8080
 
-CMD ["uv", "run", "python", "app.py"]
+# Production WSGI (not Flask dev server). Honor Cloud Run $PORT.
+# --timeout covers cold start + large XSD validate; --workers 1 keeps memory small on free tier
+CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:${PORT:-8080} --workers 1 --threads 4 --timeout 120 --access-logfile - --error-logfile - app:server"]

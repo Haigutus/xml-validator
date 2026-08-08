@@ -136,3 +136,19 @@ XSD_DIR=/path/to/XSD uv run python xsd.py message.xml
 - Ace/CSS in `assets/`
 - Deps from `uv sync` / image layers  
 - Schemas from image or mount
+
+## Security notes (public deploy)
+
+Reasonable defaults shipped for Cloud Run:
+
+| Control | Detail |
+|---------|--------|
+| Safe XML parse | `resolve_entities=False`, `no_network=True` (XXE / external DTD) |
+| Size limit | `MAX_XML_BYTES` (default 10 MiB) on XML body |
+| HTTP body cap | Flask `MAX_CONTENT_LENGTH` slightly above that |
+| Security headers | CSP (self), `X-Frame-Options: DENY`, nosniff, HSTS on HTTPS |
+| Non-root image | runs as `app` user |
+| Production server | **gunicorn** (not Flask dev server) |
+| ProxyFix | trusts one hop of `X-Forwarded-*` (Cloud Run) |
+
+Still public / unauthenticated by design (anyone can paste XML). Optional later: Cloud Armor rate limits, IAP, or auth if abuse appears.

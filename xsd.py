@@ -8,6 +8,20 @@ from lxml import etree
 # Default: ./XSD next to this file. Override with env XSD_DIR (e.g. container mount).
 XSD_DIR = Path(os.environ.get("XSD_DIR", Path(__file__).resolve().parent / "XSD")).resolve()
 
+# Reject huge payloads (DoS). Override with MAX_XML_BYTES (default 10 MiB).
+MAX_XML_BYTES = int(os.environ.get("MAX_XML_BYTES", str(10 * 1024 * 1024)))
+
+
+def _safe_parser(**kwargs):
+    """Parser hardened against XXE / external network / entity bombs."""
+    return etree.XMLParser(
+        resolve_entities=False,
+        no_network=True,
+        huge_tree=False,
+        remove_comments=False,
+        **kwargs,
+    )
+
 
 def _index_xsds(root=None):
     """namespace -> sorted list of xsd paths."""
@@ -58,25 +72,39 @@ def _root_namespace(doc):
     return doc.nsmap.get(None) or ""
 
 
+def _check_size(data: bytes | str):
+    n = len(data.encode("utf-8") if isinstance(data, str) else data)
+    if n > MAX_XML_BYTES:
+        raise ValueError(
+            f"XML too large ({n} bytes; limit {MAX_XML_BYTES}). "
+            f"Set MAX_XML_BYTES to raise the limit."
+        )
+
+
 def _parse_xml(xml):
+    parser = _safe_parser()
     if isinstance(xml, (bytes, bytearray)):
-        return etree.fromstring(xml)
+        _check_size(xml)
+        return etree.fromstring(xml, parser=parser)
     if isinstance(xml, str):
         text = xml.strip()
         if not text or text.startswith("Copy your"):
             raise ValueError("empty XML")
-        return etree.fromstring(text.encode("utf-8"))
+        raw = text.encode("utf-8")
+        _check_size(raw)
+        return etree.fromstring(raw, parser=parser)
     raise TypeError("xml must be str or bytes")
 
 
 def _load_schema(xsd):
     """xsd: path | str | bytes. Paths resolve xs:include; strings are self-contained."""
+    parser = _safe_parser()
     if isinstance(xsd, Path) or (isinstance(xsd, str) and Path(xsd).is_file()):
-        return etree.XMLSchema(etree.parse(str(xsd)))
+        return etree.XMLSchema(etree.parse(str(xsd), parser=parser))
     if isinstance(xsd, (bytes, bytearray)):
-        return etree.XMLSchema(etree.fromstring(xsd))
+        return etree.XMLSchema(etree.fromstring(xsd, parser=parser))
     if isinstance(xsd, str):
-        return etree.XMLSchema(etree.fromstring(xsd.encode("utf-8")))
+        return etree.XMLSchema(etree.fromstring(xsd.encode("utf-8"), parser=parser))
     raise TypeError("xsd must be path, str, or bytes")
 
 

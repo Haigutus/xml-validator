@@ -6,8 +6,10 @@ import subprocess
 from pathlib import Path
 
 from dash import Dash, html, dcc, Input, Output, clientside_callback, callback
+from flask import request
+from werkzeug.middleware.proxy_fix import ProxyFix
 
-from xsd import validate
+from xsd import validate, MAX_XML_BYTES
 
 GITHUB_URL = "https://github.com/Haigutus/xml-validator"
 ROOT = Path(__file__).resolve().parent
@@ -58,8 +60,43 @@ app = Dash(
         "/assets/ace/theme-monokai.js",
         "/assets/bridge.js",
     ],
+    # Harden Dash meta defaults (no remote CDN for plotly.js etc.)
+    meta_tags=[{"name": "robots", "content": "noindex, nofollow"}],
 )
 server = app.server
+
+# Cloud Run / reverse proxies: trust X-Forwarded-* from the platform only
+server.wsgi_app = ProxyFix(server.wsgi_app, x_for=1, x_proto=1, x_host=1)
+
+# Reject oversized HTTP bodies (callback payloads / accidental huge posts)
+server.config["MAX_CONTENT_LENGTH"] = MAX_XML_BYTES + (512 * 1024)
+
+
+@server.after_request
+def _security_headers(response):
+    """Baseline headers for a public, unauthenticated validator UI."""
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+    # Allow self + inline styles/scripts required by Dash/Ace; no third-party origins
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data:; "
+        "font-src 'self' data:; "
+        "connect-src 'self'; "
+        "frame-ancestors 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self'"
+    )
+    # HSTS only when TLS is terminated (Cloud Run / custom domain)
+    if request.is_secure or request.headers.get("X-Forwarded-Proto", "").lower() == "https":
+        response.headers["Strict-Transport-Security"] = (
+            "max-age=31536000; includeSubDomains"
+        )
+    return response
 
 # Prefer SVG favicon (</> mark)
 app.index_string = """<!DOCTYPE html>
@@ -188,6 +225,7 @@ def on_xml(content):
 
 def main():
     # Cloud Run sets PORT (often 8080); local default 8030 for bare `python app.py`
+    # Prefer gunicorn in containers (see Containerfile); this path is for dev only.
     port = int(os.getenv("PORT", "8030"))
     app.run(
         debug=False,
