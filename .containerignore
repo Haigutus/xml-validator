@@ -1,12 +1,15 @@
-# Keep the image small and schema-free — mount XSD at runtime
-XSD/
 .venv/
 __pycache__/
 **/__pycache__/
 *.pyc
 .git/
 .pytest_cache/
-*.md
-scripts/
-examples/**/*.md
 .python-version
+# Keep XSD in the image; ignore only large non-schema noise if any
+**/*.pdf
+**/*.docx
+**/*.doc
+**/*.xlsx
+**/*.xls
+**/*.ppt
+**/*.pptx

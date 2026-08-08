@@ -1,25 +1,25 @@
-# Podman:  podman compose up --build
-# Docker:  docker compose up --build
+# Local Podman / Docker Compose
+# Default: use XSD baked into the image (same as Cloud Run).
+# Optional host override: HOST_XSD=1 podman compose up --build
 #
-# XSD registry is mounted from the host so you can refresh schemas without
-# rebuilding the image (run ./scripts/update_*.sh on the host, then restart).
+#   export GIT_COMMIT_COUNT=$(git rev-list --count HEAD)
+#   export PODMAN_COMPOSE_PROVIDER=podman-compose   # if snap docker-compose conflicts
+#   podman compose up --build -d
 
 services:
   xml-validator:
     build:
       context: .
-      # Podman prefers Containerfile; Docker uses Dockerfile (same content)
       dockerfile: Containerfile
       args:
-        # host must pass commit count when building for accurate version in image
         GIT_COMMIT_COUNT: ${GIT_COMMIT_COUNT:-0}
     image: xml-validator:latest
     ports:
-      - "8030:8030"
+      - "${HOST_PORT:-8030}:8080"
     environment:
-      PORT: "8030"
+      PORT: "8080"
       XSD_DIR: /app/XSD
-    volumes:
-      # Host schema registry — update on host, restart container to re-index
-      - ./XSD:/app/XSD:ro
+    # Uncomment or set HOST_XSD=1 via override — see scripts/run.sh
+    # volumes:
+    #   - ./XSD:/app/XSD:ro
     restart: unless-stopped

@@ -2,128 +2,116 @@
 
 Live browser UI to validate **European energy market XML** against a local XSD registry:
 
-- **ENTSO-E ESMP** (IEC 62325 / CIM market documents) → `XSD/ENTSOE_ESMP/`
-- **Edig@s** 5.1 and 6.1 → `XSD/ENTSOG_EDIGAS/5.1/`, `XSD/ENTSOG_EDIGAS/6.1/`
-- CGMES FullModel helpers, OPDM QAR, RGCE reporting
+- **ENTSO-E ESMP** → `XSD/ENTSOE_ESMP/`
+- **Edig@s** 5.1 / 6.1 → `XSD/ENTSOG_EDIGAS/5.1/`, `XSD/ENTSOG_EDIGAS/6.1/`
+- CGMES, OPDM, RGCE reporting (static extras)
 
-Validation is **in-memory lxml**. Ace + app assets are **vendored** (offline UI). Deploy with **[uv](https://docs.astral.sh/uv/)** and **[Podman](https://podman.io/)** (Compose-compatible).
+**In-memory lxml**, vendored Ace UI, **[uv](https://docs.astral.sh/uv/)** deps.  
+Default deploy target: **Google Cloud Run** (scale-to-zero / free-tier friendly). Schemas are **baked into the image**; you can still **override** them with a host mount for local work.
 
 Repo: [github.com/Haigutus/xml-validator](https://github.com/Haigutus/xml-validator)
 
 ## Version
 
-Header shows **`0.2.<n>`**, where `<n>` is the git commit count (`git rev-list --count HEAD`).  
-Container builds without `.git` use `--build-arg GIT_COMMIT_COUNT=…` (written to `/app/VERSION`).
+Header shows **`0.2.<n>`** (`n` = `git rev-list --count HEAD`).  
+Container builds: `--build-arg GIT_COMMIT_COUNT=…` → `/app/VERSION`.
 
-## Quick start (uv, host)
+## Quick start (uv on host)
 
 ```bash
-# install uv: https://docs.astral.sh/uv/getting-started/installation/
 uv sync
 uv run python app.py
 # → http://0.0.0.0:8030
 ```
 
-Schemas are read from `./XSD` (or `$XSD_DIR`). Dependencies are declared only in **`pyproject.toml`** / **`uv.lock`**.
+Dependencies: **`pyproject.toml`** + **`uv.lock`** only.
 
-## Podman (recommended)
+## Local containers (Podman)
 
-The container image holds **only the app** (Python/uv, Ace UI). The **`XSD/` tree is mounted from the host**, so you can refresh schemas without rebuilding the image.
-
-### Compose
+Helper scripts (prefer these over raw compose if snap `docker-compose` fights Podman):
 
 ```bash
-# build + run (Podman 4+ has `podman compose`; or use podman-compose)
-export GIT_COMMIT_COUNT=$(git rev-list --count HEAD)
-podman compose up --build -d
+./scripts/build.sh              # build image (XSD baked in)
+./scripts/run.sh                # run with baked XSD  → :8030
+./scripts/run.sh --host-xsd     # mount ./XSD over baked schemas
+./scripts/up.sh                 # build + run
+./scripts/up.sh --host-xsd -d   # build + run detached with host XSD
+```
 
+Or compose:
+
+```bash
+export GIT_COMMIT_COUNT=$(git rev-list --count HEAD)
+export PODMAN_COMPOSE_PROVIDER=podman-compose   # recommended
+systemctl --user start podman.socket            # if needed
+
+podman compose -f compose.yml up --build -d
 # → http://localhost:8030
 ```
 
-Equivalent with Docker Compose v2: `GIT_COMMIT_COUNT=$(git rev-list --count HEAD) docker compose up --build -d`.
+### Baked XSD vs host mount
 
-### One-shot (no compose)
+| Mode | How | When |
+|------|-----|------|
+| **Baked (default)** | `COPY XSD` in image | Cloud Run, simple local run |
+| **Host override** | `-v ./XSD:/app/XSD:ro` or `./scripts/run.sh --host-xsd` | Local schema experiments without rebuild |
 
-```bash
-podman build -t xml-validator -f Containerfile \
-  --build-arg GIT_COMMIT_COUNT="$(git rev-list --count HEAD)" .
+Mounting `./XSD` **replaces** the image directory at `/app/XSD` (standard container bind-mount behaviour).
 
-podman run --rm -p 8030:8030 \
-  -e XSD_DIR=/app/XSD \
-  -v "$PWD/XSD:/app/XSD:ro" \
-  xml-validator
-```
+## Google Cloud Run (scale-to-zero)
 
-### Update schemas without rebuilding the image
-
-On the **host** (next to this repo):
+Assumes low traffic and **min instances = 0** (cold start on first hit; often free-tier eligible).
 
 ```bash
-./scripts/update_xsds.sh              # ENTSO-E + Edig@s 5.1/6.1
-# or add/edit files under ./XSD/ manually
+gcloud auth login
+gcloud config set project YOUR_PROJECT_ID
 
-# restart so the process re-indexes XSD/
-podman compose restart
-# or: podman restart <container>
+# optional: enable APIs once
+gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com
+
+./scripts/deploy-cloudrun.sh
+# REGION=europe-west1 SERVICE=xml-validator ./scripts/deploy-cloudrun.sh
 ```
 
-The volume mount means the container always sees the current host `XSD/` tree.
+Deploy settings in the script: **512 MiB**, **1 vCPU**, **min-instances 0**, **max 3**, public URL.
+
+Then map **xsd.cimtools.eu** in Cloud Console → Cloud Run → Domain mappings (managed TLS).
+
+**Schema updates on Cloud Run:** refresh `XSD/` on the host → commit → push → redeploy (image rebuild). There is no durable host mount on Cloud Run free tier.
 
 ## XSD registry
 
 | Folder | Content |
 |--------|---------|
-| `XSD/ENTSOE_ESMP/` | Current ENTSO-E ESMP / CIM package (replaced on update) |
-| `XSD/ENTSOG_EDIGAS/5.1/` | Current Edig@s 5.1 package (replaced on update) |
-| `XSD/ENTSOG_EDIGAS/6.1/` | Current Edig@s 6.1 package (replaced on update) |
-| `XSD/CGMES_*`, `OPDM_*`, `urn-entsoe-*` | Static extras |
+| `XSD/ENTSOE_ESMP/` | ENTSO-E ESMP / CIM (replaced on update) |
+| `XSD/ENTSOG_EDIGAS/5.1/` | Edig@s 5.1 (replaced on update) |
+| `XSD/ENTSOG_EDIGAS/6.1/` | Edig@s 6.1 (replaced on update) |
+| `XSD/CGMES_*`, `OPDM_*`, … | Static extras |
 
-Env: `XSD_DIR` — path to the registry (default: `./XSD`; in the container: `/app/XSD`).
+Env: `XSD_DIR` (default `./XSD`, container `/app/XSD`).
 
-On process start every `*.xsd` under that directory is indexed by `targetNamespace`.
-
-## Updating the XSD registry (host scripts)
-
-Needs `curl`/`wget`, `unzip`, and for ENTSO-E `.7z` either **`p7zip-full`** (`7z`) or **`uv`** (scripts fall back to `uv run --with py7zr`).
-
-Each script **deletes only its target folder and rewrites it**.
-
-### All packs
+### Refresh packages (host)
 
 ```bash
-./scripts/update_xsds.sh
-```
-
-### ENTSO-E ESMP only → `XSD/ENTSOE_ESMP/`
-
-```bash
+./scripts/update_xsds.sh              # ENTSO-E + Edig@s 5.1/6.1
 ./scripts/update_entsoe_xsds.sh
-
-ENTSOE_XSD_URL=https://www.entsoe.eu/Documents/EDI/Library/CIM_xsd_package_v2026.7z \
-  ./scripts/update_entsoe_xsds.sh
-```
-
-Catalogue: [ENTSO-E EDI Library](https://www.entsoe.eu/publications/electronic-data-interchange-edi-library/).
-
-### Edig@s only → `XSD/ENTSOG_EDIGAS/{5.1,6.1}/`
-
-```bash
-./scripts/update_edigas_xsds.sh          # both
 ./scripts/update_edigas_xsds.sh 5.1
-./scripts/update_edigas_xsds.sh 6.1
 ```
 
-Source: [edigas.org downloads](https://edigas.org/edigas/downloads/).
+Needs `curl`/`wget`, `unzip`, and `7z` **or** `uv` (ENTSO-E `.7z` fallback).
 
-### Persist schemas in git (optional)
+Then:
 
 ```bash
-git add XSD/ENTSOE_ESMP XSD/ENTSOG_EDIGAS
-git commit -m "Refresh ENTSO-E ESMP and Edig@s XSD packages"
-git push
+# local with bake
+./scripts/up.sh
+
+# or Cloud Run
+git add XSD && git commit -m "Refresh XSDs" && git push
+./scripts/deploy-cloudrun.sh
 ```
 
-### Ace UI assets
+### Ace assets
 
 ```bash
 ./scripts/vendor_ace.sh 1.36.5
@@ -133,21 +121,18 @@ git push
 
 ```bash
 uv run python xsd.py examples/ACK_positive.xml
-XSD_DIR=/path/to/XSD uv run python xsd.py path/to/message.xml
+XSD_DIR=/path/to/XSD uv run python xsd.py message.xml
 ```
 
-## Image vs data
+## Image contents
 
-| In the container image | On the host (mounted) |
-|------------------------|------------------------|
-| App (`app.py`, `xsd.py`) | `XSD/` schema registry |
-| `uv` venv + dependencies | (optional) update scripts |
-| Vendored Ace / CSS (`assets/`) | |
+| In image | Optional at runtime |
+|----------|---------------------|
+| App, uv venv, Ace UI | — |
+| **Baked `XSD/`** | Host mount `./XSD` → `/app/XSD` overrides bake |
 
-So: **rebuild the image only when app code or dependencies change**; **schema updates = host scripts + container restart**.
+## Offline
 
-## Offline runtime
-
-- Ace / CSS under `assets/`
-- Python deps from `uv sync` / image layers
-- Schemas from mounted (or local) `XSD/`
+- Ace/CSS in `assets/`
+- Deps from `uv sync` / image layers  
+- Schemas from image or mount

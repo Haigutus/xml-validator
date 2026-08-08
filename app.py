@@ -187,6 +187,7 @@ def on_xml(content):
 
 
 def main():
+    # Cloud Run sets PORT (often 8080); local default 8030 for bare `python app.py`
     port = int(os.getenv("PORT", "8030"))
     app.run(
         debug=False,

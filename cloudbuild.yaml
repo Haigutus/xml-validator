@@ -1,0 +1,15 @@
+# Used by scripts/deploy-cloudrun.sh
+# substitutions: _IMAGE, _GIT_COMMIT_COUNT
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_IMAGE}
+      - -f
+      - Containerfile
+      - --build-arg
+      - GIT_COMMIT_COUNT=${_GIT_COMMIT_COUNT}
+      - .
+images:
+  - ${_IMAGE}

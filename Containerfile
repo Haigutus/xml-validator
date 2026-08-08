@@ -1,6 +1,6 @@
-# Podman / Docker image — application only (no XSD schemas baked in).
-# Mount host XSD/ at runtime: -v ./XSD:/app/XSD:ro
 # syntax=docker/dockerfile:1
+# App image with XSD schemas baked in (Cloud Run / free-tier friendly).
+# Optional override at runtime: -v ./XSD:/app/XSD:ro  (host tree replaces baked /app/XSD)
 FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
 
 WORKDIR /app
@@ -8,21 +8,20 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
-# App code + vendored UI assets (explicit — XSD excluded via .containerignore)
 COPY app.py xsd.py ./
 COPY assets ./assets
 COPY examples ./examples
+# Schema registry — part of the image for Cloud Run / simple deploys
+COPY XSD ./XSD
 
-# Bake version for containers without .git (0.2.<commit count at build time)
 ARG GIT_COMMIT_COUNT=0
 RUN echo "0.2.${GIT_COMMIT_COUNT}" > /app/VERSION
 
-# Mount point for host schema registry (populated at run time)
-RUN mkdir -p /app/XSD
 ENV XSD_DIR=/app/XSD
-ENV PORT=8030
+ENV PORT=8080
 ENV PATH="/app/.venv/bin:$PATH"
 
-EXPOSE 8030
+# Cloud Run injects PORT (default 8080); local scripts can set 8030
+EXPOSE 8080
 
 CMD ["uv", "run", "python", "app.py"]

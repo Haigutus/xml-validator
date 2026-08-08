@@ -1,6 +1,4 @@
-# Compatibility alias — same as compose.yml
-# Prefer: podman compose -f compose.yml up --build
-
+# Alias of compose.yml for tools that look for docker-compose.yml
 services:
   xml-validator:
     build:
@@ -10,10 +8,8 @@ services:
         GIT_COMMIT_COUNT: ${GIT_COMMIT_COUNT:-0}
     image: xml-validator:latest
     ports:
-      - "8030:8030"
+      - "${HOST_PORT:-8030}:8080"
     environment:
-      PORT: "8030"
+      PORT: "8080"
       XSD_DIR: /app/XSD
-    volumes:
-      - ./XSD:/app/XSD:ro
     restart: unless-stopped
