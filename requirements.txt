@@ -1,4 +1,0 @@
-# Prefer: uv sync && uv run python app.py
-# Generated-compatible pin range for plain pip:
-dash>=3.0,<5
-lxml>=5.0

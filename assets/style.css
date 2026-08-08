@@ -39,11 +39,27 @@ html, body {
   position: relative;
 }
 
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
 .header h1 {
   margin: 0;
   font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.02em;
+}
+
+.app-version {
+  font-size: 0.65rem;
+  font-weight: 400;
+  color: #888;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.02em;
+  user-select: all;
 }
 
 .header a {

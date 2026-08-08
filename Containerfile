@@ -13,6 +13,10 @@ COPY app.py xsd.py ./
 COPY assets ./assets
 COPY examples ./examples
 
+# Bake version for containers without .git (0.2.<commit count at build time)
+ARG GIT_COMMIT_COUNT=0
+RUN echo "0.2.${GIT_COMMIT_COUNT}" > /app/VERSION
+
 # Mount point for host schema registry (populated at run time)
 RUN mkdir -p /app/XSD
 ENV XSD_DIR=/app/XSD

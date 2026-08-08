@@ -10,6 +10,9 @@ services:
       context: .
       # Podman prefers Containerfile; Docker uses Dockerfile (same content)
       dockerfile: Containerfile
+      args:
+        # host must pass commit count when building for accurate version in image
+        GIT_COMMIT_COUNT: ${GIT_COMMIT_COUNT:-0}
     image: xml-validator:latest
     ports:
       - "8030:8030"

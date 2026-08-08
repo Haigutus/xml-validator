@@ -12,6 +12,9 @@ COPY app.py xsd.py ./
 COPY assets ./assets
 COPY examples ./examples
 
+ARG GIT_COMMIT_COUNT=0
+RUN echo "0.2.${GIT_COMMIT_COUNT}" > /app/VERSION
+
 RUN mkdir -p /app/XSD
 ENV XSD_DIR=/app/XSD
 ENV PORT=8030

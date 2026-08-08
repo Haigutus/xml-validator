@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: Containerfile
+      args:
+        GIT_COMMIT_COUNT: ${GIT_COMMIT_COUNT:-0}
     image: xml-validator:latest
     ports:
       - "8030:8030"

@@ -10,6 +10,11 @@ Validation is **in-memory lxml**. Ace + app assets are **vendored** (offline UI)
 
 Repo: [github.com/Haigutus/xml-validator](https://github.com/Haigutus/xml-validator)
 
+## Version
+
+Header shows **`0.2.<n>`**, where `<n>` is the git commit count (`git rev-list --count HEAD`).  
+Container builds without `.git` use `--build-arg GIT_COMMIT_COUNT=…` (written to `/app/VERSION`).
+
 ## Quick start (uv, host)
 
 ```bash
@@ -19,7 +24,7 @@ uv run python app.py
 # → http://0.0.0.0:8030
 ```
 
-Schemas are read from `./XSD` (or `$XSD_DIR`).
+Schemas are read from `./XSD` (or `$XSD_DIR`). Dependencies are declared only in **`pyproject.toml`** / **`uv.lock`**.
 
 ## Podman (recommended)
 
@@ -29,17 +34,19 @@ The container image holds **only the app** (Python/uv, Ace UI). The **`XSD/` tre
 
 ```bash
 # build + run (Podman 4+ has `podman compose`; or use podman-compose)
+export GIT_COMMIT_COUNT=$(git rev-list --count HEAD)
 podman compose up --build -d
 
 # → http://localhost:8030
 ```
 
-Equivalent with Docker Compose v2 if you prefer: `docker compose up --build -d` (same `compose.yml`).
+Equivalent with Docker Compose v2: `GIT_COMMIT_COUNT=$(git rev-list --count HEAD) docker compose up --build -d`.
 
 ### One-shot (no compose)
 
 ```bash
-podman build -t xml-validator -f Containerfile .
+podman build -t xml-validator -f Containerfile \
+  --build-arg GIT_COMMIT_COUNT="$(git rev-list --count HEAD)" .
 
 podman run --rm -p 8030:8030 \
   -e XSD_DIR=/app/XSD \

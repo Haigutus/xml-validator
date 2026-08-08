@@ -1,6 +1,8 @@
 """XML Validator UI — Dash + vendored Ace, offline-capable."""
 
 import os
+import re
+import subprocess
 from pathlib import Path
 
 from dash import Dash, html, dcc, Input, Output, clientside_callback, callback
@@ -8,22 +10,46 @@ from dash import Dash, html, dcc, Input, Output, clientside_callback, callback
 from xsd import validate
 
 GITHUB_URL = "https://github.com/Haigutus/xml-validator"
-EXAMPLES = Path(__file__).resolve().parent / "examples"
+ROOT = Path(__file__).resolve().parent
+EXAMPLES = ROOT / "examples"
 DEMO_FILE = EXAMPLES / "ACK_demo_with_error.xml"
 
 INITIAL_XML = DEMO_FILE.read_text(encoding="utf-8") if DEMO_FILE.is_file() else (
     "<!-- Demo file missing; paste IEC 62325 / EDIGAS XML here -->\n<root/>\n"
 )
 
+
+def _commit_count() -> int:
+    """Git commit count for the current checkout (0 if unavailable)."""
+    try:
+        out = subprocess.check_output(
+            ["git", "rev-list", "--count", "HEAD"],
+            cwd=ROOT,
+            stderr=subprocess.DEVNULL,
+            text=True,
+        )
+        return int(out.strip())
+    except (subprocess.CalledProcessError, FileNotFoundError, ValueError):
+        pass
+    # Container / no .git: optional VERSION file written at build time
+    version_file = ROOT / "VERSION"
+    if version_file.is_file():
+        m = re.search(r"0\.2\.(\d+)", version_file.read_text())
+        if m:
+            return int(m.group(1))
+    return 0
+
+
+# Base 0.2; patch = commit count (e.g. 0.2.5)
+APP_VERSION = f"0.2.{_commit_count()}"
+
 # All UI JS is local:
 #   - Ace: assets/ace/* + assets/bridge.js (explicit load order)
 #   - Dash/React/dcc/html: installed package via /_dash-component-suites/ (serve_locally)
-# No CDN external_stylesheets / external_scripts to third parties.
 app = Dash(
     __name__,
-    title="XML Validator",
+    title=f"XML Validator {APP_VERSION}",
     serve_locally=True,
-    # Don't auto-inject every .js under assets/ (order matters for Ace)
     assets_ignore=r".*\.js",
     external_scripts=[
         "/assets/ace/ace.min.js",
@@ -35,19 +61,48 @@ app = Dash(
 )
 server = app.server
 
+# Prefer SVG favicon (</> mark)
+app.index_string = """<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>{%title%}</title>
+        <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+        {%css%}
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+"""
+
 app.layout = html.Div(
     className="page",
     children=[
         html.Header(
             className="header",
             children=[
-                html.H1("XML Validator"),
+                html.Div(
+                    className="header-left",
+                    children=[
+                        html.H1("XML Validator"),
+                        html.Span(
+                            APP_VERSION,
+                            className="app-version",
+                            title="0.2.<git commit count>",
+                        ),
+                    ],
+                ),
                 html.A(
                     html.Img(src="/assets/github-mark-white.svg", alt="GitHub"),
                     href=GITHUB_URL,
                     target="_blank",
                     title="View on GitHub",
-                    # link target is external only when user clicks; not required for UI boot
                     rel="noopener noreferrer",
                 ),
             ],
@@ -133,7 +188,6 @@ def on_xml(content):
 
 def main():
     port = int(os.getenv("PORT", "8030"))
-    # No devtools; silence any version-check against plotly CDN
     app.run(
         debug=False,
         host="0.0.0.0",
