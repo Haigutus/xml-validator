@@ -1,0 +1,22 @@
+# Podman:  podman compose up --build
+# Docker:  docker compose up --build
+#
+# XSD registry is mounted from the host so you can refresh schemas without
+# rebuilding the image (run ./scripts/update_*.sh on the host, then restart).
+
+services:
+  xml-validator:
+    build:
+      context: .
+      # Podman prefers Containerfile; Docker uses Dockerfile (same content)
+      dockerfile: Containerfile
+    image: xml-validator:latest
+    ports:
+      - "8030:8030"
+    environment:
+      PORT: "8030"
+      XSD_DIR: /app/XSD
+    volumes:
+      # Host schema registry — update on host, restart container to re-index
+      - ./XSD:/app/XSD:ro
+    restart: unless-stopped

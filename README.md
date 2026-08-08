@@ -1,36 +1,66 @@
 # XML Validator
 
-Live browser UI to validate **European energy market XML** against bundled XSDs:
+Live browser UI to validate **European energy market XML** against a local XSD registry:
 
 - **ENTSO-E ESMP** (IEC 62325 / CIM market documents) → `XSD/ENTSOE_ESMP/`
 - **Edig@s** 5.1 and 6.1 → `XSD/ENTSOG_EDIGAS/5.1/`, `XSD/ENTSOG_EDIGAS/6.1/`
 - CGMES FullModel helpers, OPDM QAR, RGCE reporting
 
-Validation is **in-memory lxml**. Ace + app assets are **vendored** (offline UI). Deployment uses **[uv](https://docs.astral.sh/uv/)**.
+Validation is **in-memory lxml**. Ace + app assets are **vendored** (offline UI). Deploy with **[uv](https://docs.astral.sh/uv/)** and **[Podman](https://podman.io/)** (Compose-compatible).
 
 Repo: [github.com/Haigutus/xml-validator](https://github.com/Haigutus/xml-validator)
 
-## Quick start (uv)
+## Quick start (uv, host)
 
 ```bash
-# install uv if needed: https://docs.astral.sh/uv/getting-started/installation/
+# install uv: https://docs.astral.sh/uv/getting-started/installation/
 uv sync
 uv run python app.py
 # → http://0.0.0.0:8030
 ```
 
-Or one-shot:
+Schemas are read from `./XSD` (or `$XSD_DIR`).
+
+## Podman (recommended)
+
+The container image holds **only the app** (Python/uv, Ace UI). The **`XSD/` tree is mounted from the host**, so you can refresh schemas without rebuilding the image.
+
+### Compose
 
 ```bash
-uv run --with dash --with lxml python app.py
-```
+# build + run (Podman 4+ has `podman compose`; or use podman-compose)
+podman compose up --build -d
 
-### Docker (uv image)
-
-```bash
-docker compose up --build
 # → http://localhost:8030
 ```
+
+Equivalent with Docker Compose v2 if you prefer: `docker compose up --build -d` (same `compose.yml`).
+
+### One-shot (no compose)
+
+```bash
+podman build -t xml-validator -f Containerfile .
+
+podman run --rm -p 8030:8030 \
+  -e XSD_DIR=/app/XSD \
+  -v "$PWD/XSD:/app/XSD:ro" \
+  xml-validator
+```
+
+### Update schemas without rebuilding the image
+
+On the **host** (next to this repo):
+
+```bash
+./scripts/update_xsds.sh              # ENTSO-E + Edig@s 5.1/6.1
+# or add/edit files under ./XSD/ manually
+
+# restart so the process re-indexes XSD/
+podman compose restart
+# or: podman restart <container>
+```
+
+The volume mount means the container always sees the current host `XSD/` tree.
 
 ## XSD registry
 
@@ -41,13 +71,15 @@ docker compose up --build
 | `XSD/ENTSOG_EDIGAS/6.1/` | Current Edig@s 6.1 package (replaced on update) |
 | `XSD/CGMES_*`, `OPDM_*`, `urn-entsoe-*` | Static extras |
 
-On startup every `*.xsd` under `XSD/` is indexed by `targetNamespace`.
+Env: `XSD_DIR` — path to the registry (default: `./XSD`; in the container: `/app/XSD`).
 
-## Updating the XSD registry
+On process start every `*.xsd` under that directory is indexed by `targetNamespace`.
 
-Needs `curl`/`wget`, `unzip`, and for ENTSO-E `.7z` packages **`p7zip-full`** (`7z`).
+## Updating the XSD registry (host scripts)
 
-Each script **deletes the target folder and rewrites it** with the newest download (no date-stamped copies to clean up).
+Needs `curl`/`wget`, `unzip`, and for ENTSO-E `.7z` either **`p7zip-full`** (`7z`) or **`uv`** (scripts fall back to `uv run --with py7zr`).
+
+Each script **deletes only its target folder and rewrites it**.
 
 ### All packs
 
@@ -60,7 +92,6 @@ Each script **deletes the target folder and rewrites it** with the newest downlo
 ```bash
 ./scripts/update_entsoe_xsds.sh
 
-# pin URL when ENTSO-E renames the package:
 ENTSOE_XSD_URL=https://www.entsoe.eu/Documents/EDI/Library/CIM_xsd_package_v2026.7z \
   ./scripts/update_entsoe_xsds.sh
 ```
@@ -75,22 +106,12 @@ Catalogue: [ENTSO-E EDI Library](https://www.entsoe.eu/publications/electronic-d
 ./scripts/update_edigas_xsds.sh 6.1
 ```
 
-Scrapes [edigas.org downloads](https://edigas.org/edigas/downloads/) for the latest full zip names (with fallbacks). Override:
+Source: [edigas.org downloads](https://edigas.org/edigas/downloads/).
 
-```bash
-EDIGAS_5_1_URL=https://edigas.org/_files/downloads/….zip \
-EDIGAS_6_1_URL=https://edigas.org/_files/downloads/….zip \
-  ./scripts/update_edigas_xsds.sh
-```
-
-### After updating
-
-1. Restart the app (or rebuild Docker).
-2. Commit the refreshed trees:
+### Persist schemas in git (optional)
 
 ```bash
 git add XSD/ENTSOE_ESMP XSD/ENTSOG_EDIGAS
-git status   # review
 git commit -m "Refresh ENTSO-E ESMP and Edig@s XSD packages"
 git push
 ```
@@ -105,13 +126,21 @@ git push
 
 ```bash
 uv run python xsd.py examples/ACK_positive.xml
-uv run python xsd.py path/to/message.xml
+XSD_DIR=/path/to/XSD uv run python xsd.py path/to/message.xml
 ```
+
+## Image vs data
+
+| In the container image | On the host (mounted) |
+|------------------------|------------------------|
+| App (`app.py`, `xsd.py`) | `XSD/` schema registry |
+| `uv` venv + dependencies | (optional) update scripts |
+| Vendored Ace / CSS (`assets/`) | |
+
+So: **rebuild the image only when app code or dependencies change**; **schema updates = host scripts + container restart**.
 
 ## Offline runtime
 
-- Ace / CSS / favicon under `assets/`
-- Python deps from `uv sync` (`.venv`)
-- Schemas from `XSD/`
-
-Network is only required for `uv sync` / `docker build` and optional XSD update scripts.
+- Ace / CSS under `assets/`
+- Python deps from `uv sync` / image layers
+- Schemas from mounted (or local) `XSD/`

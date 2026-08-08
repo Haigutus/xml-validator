@@ -1,7 +1,17 @@
+# Compatibility alias — same as compose.yml
+# Prefer: podman compose -f compose.yml up --build
+
 services:
   xml-validator:
-    build: .
+    build:
+      context: .
+      dockerfile: Containerfile
+    image: xml-validator:latest
     ports:
       - "8030:8030"
     environment:
       PORT: "8030"
+      XSD_DIR: /app/XSD
+    volumes:
+      - ./XSD:/app/XSD:ro
+    restart: unless-stopped

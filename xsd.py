@@ -1,14 +1,17 @@
 """Minimal in-memory XML / XSD validation (lxml, no temp files)."""
 
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from lxml import etree
 
-XSD_DIR = Path(__file__).resolve().parent / "XSD"
+# Default: ./XSD next to this file. Override with env XSD_DIR (e.g. container mount).
+XSD_DIR = Path(os.environ.get("XSD_DIR", Path(__file__).resolve().parent / "XSD")).resolve()
 
 
-def _index_xsds(root=XSD_DIR):
+def _index_xsds(root=None):
     """namespace -> sorted list of xsd paths."""
+    root = Path(root) if root else XSD_DIR
     index = {}
     if not root.is_dir():
         return index
@@ -23,6 +26,15 @@ def _index_xsds(root=XSD_DIR):
 
 
 XSD_INDEX = _index_xsds()
+
+
+def reindex_xsds(root=None):
+    """Rebuild namespace index (call after host XSD mount is updated)."""
+    global XSD_INDEX, XSD_DIR
+    if root is not None:
+        XSD_DIR = Path(root).resolve()
+    XSD_INDEX = _index_xsds(XSD_DIR)
+    return XSD_INDEX
 
 
 def _pick_xsd(paths):
