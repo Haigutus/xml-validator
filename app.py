@@ -68,6 +68,12 @@ server = app.server
 # Cloud Run / reverse proxies: trust X-Forwarded-* from the platform only
 server.wsgi_app = ProxyFix(server.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
+
+@server.route("/healthz")
+def healthz():
+    """Liveness/readiness — does not build the XSD index (fast cold-start probe)."""
+    return "ok", 200, {"Content-Type": "text/plain; charset=utf-8"}
+
 # Reject oversized HTTP bodies (callback payloads / accidental huge posts)
 server.config["MAX_CONTENT_LENGTH"] = MAX_XML_BYTES + (512 * 1024)
 

@@ -58,26 +58,37 @@ podman compose -f compose.yml up --build -d
 
 Mounting `./XSD` **replaces** the image directory at `/app/XSD` (standard container bind-mount behaviour).
 
-## Google Cloud Run (scale-to-zero)
+## Google Cloud Run (scale-to-zero / free-tier)
 
-Assumes low traffic and **min instances = 0** (cold start on first hit; often free-tier eligible).
+Designed for **min-instances = 0** (pay mostly when handling requests). Cold starts are mitigated without a warm instance.
 
 ```bash
 gcloud auth login
 gcloud config set project YOUR_PROJECT_ID
-
-# optional: enable APIs once
 gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com
 
 ./scripts/deploy-cloudrun.sh
 # REGION=europe-west1 SERVICE=xml-validator ./scripts/deploy-cloudrun.sh
 ```
 
-Deploy settings in the script: **512 MiB**, **1 vCPU**, **min-instances 0**, **max 3**, public URL.
+### Cold-start practices (in deploy + app)
 
-Then map **xsd.cimtools.eu** in Cloud Console → Cloud Run → Domain mappings (managed TLS).
+| Practice | How |
+|----------|-----|
+| Scale to zero | `--min-instances=0` |
+| Startup CPU boost | `--cpu-boost` |
+| Gen1 environment | Faster cold start than gen2 for this workload |
+| Small instance | **512 MiB**, **1 vCPU**, **max 2** instances |
+| Concurrency | **40** requests per instance |
+| Fast probes | `/healthz` — no XSD index work |
+| Lazy XSD index | Built on **first validate**, not import/health |
+| Faster index scan | Root-only `iterparse` per schema file |
+| gunicorn | 1 worker, 4 threads; listens ASAP |
+| Request-based CPU | Default throttling (no always-on CPU bill) |
 
-**Schema updates on Cloud Run:** refresh `XSD/` on the host → commit → push → redeploy (image rebuild). There is no durable host mount on Cloud Run free tier.
+Map **xsd.cimtools.eu** in Cloud Console → Cloud Run → Domain mappings (managed TLS).
+
+**Schema updates:** commit refreshed `XSD/` → push → `./scripts/deploy-cloudrun.sh` (image rebuild).
 
 ## XSD registry
 

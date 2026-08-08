@@ -24,31 +24,86 @@ def _safe_parser(**kwargs):
 
 
 def _index_xsds(root=None):
-    """namespace -> sorted list of xsd paths."""
+    """namespace -> sorted list of xsd paths.
+
+    Uses iterparse(start) so we only read the root element of each file
+    (faster cold-start indexing than full parse of every schema).
+    """
     root = Path(root) if root else XSD_DIR
     index = {}
     if not root.is_dir():
         return index
     for path in sorted(root.rglob("*.xsd")):
         try:
-            ns = etree.parse(str(path)).getroot().get("targetNamespace", "")
-        except etree.XMLSyntaxError:
-            continue
+            ns = ""
+            # Root-only scan (faster than full parse of every schema)
+            for _event, elem in etree.iterparse(
+                str(path),
+                events=("start",),
+                resolve_entities=False,
+                no_network=True,
+                huge_tree=False,
+            ):
+                ns = elem.get("targetNamespace", "") or ""
+                elem.clear()
+                break
+        except (etree.XMLSyntaxError, OSError, TypeError):
+            # Fallback if iterparse kwargs unsupported
+            try:
+                ns = etree.parse(str(path), parser=_safe_parser()).getroot().get(
+                    "targetNamespace", ""
+                ) or ""
+            except (etree.XMLSyntaxError, OSError):
+                continue
         if ns:
             index.setdefault(ns, []).append(path)
     return index
 
 
-XSD_INDEX = _index_xsds()
+# Lazy index: built on first validate(), not at import (faster Cloud Run cold start)
+_XSD_INDEX = None
+
+
+def get_xsd_index():
+    """Return namespace index, building it once on first use."""
+    global _XSD_INDEX
+    if _XSD_INDEX is None:
+        _XSD_INDEX = _index_xsds()
+    return _XSD_INDEX
 
 
 def reindex_xsds(root=None):
     """Rebuild namespace index (call after host XSD mount is updated)."""
-    global XSD_INDEX, XSD_DIR
+    global _XSD_INDEX, XSD_DIR
     if root is not None:
         XSD_DIR = Path(root).resolve()
-    XSD_INDEX = _index_xsds(XSD_DIR)
-    return XSD_INDEX
+    _XSD_INDEX = _index_xsds(XSD_DIR)
+    return _XSD_INDEX
+
+
+class _LazyIndex:
+    """Dict-like proxy so `XSD_INDEX.get(...)` stays valid without import-time work."""
+
+    def get(self, *a, **k):
+        return get_xsd_index().get(*a, **k)
+
+    def values(self):
+        return get_xsd_index().values()
+
+    def keys(self):
+        return get_xsd_index().keys()
+
+    def items(self):
+        return get_xsd_index().items()
+
+    def __len__(self):
+        return len(get_xsd_index())
+
+    def __contains__(self, key):
+        return key in get_xsd_index()
+
+
+XSD_INDEX = _LazyIndex()
 
 
 def _pick_xsd(paths):
@@ -179,7 +234,7 @@ def validate(xml, xsd=None):
             xsd_used = "provided XSD" if not isinstance(xsd, Path) else Path(xsd).name
         else:
             ns = _root_namespace(doc)
-            paths = XSD_INDEX.get(ns, [])
+            paths = get_xsd_index().get(ns, [])
             if not paths:
                 status.extend(_log_lines(
                     ts,
@@ -233,7 +288,8 @@ if __name__ == "__main__":
 
     xml_path = Path(sys.argv[1]) if len(sys.argv) > 1 else None
     if not xml_path or not xml_path.is_file():
-        print(f"Indexed {sum(len(v) for v in XSD_INDEX.values())} XSDs, {len(XSD_INDEX)} namespaces")
+        idx = get_xsd_index()
+        print(f"Indexed {sum(len(v) for v in idx.values())} XSDs, {len(idx)} namespaces")
         print("Usage: python xsd.py <file.xml>")
         sys.exit(0)
 
