@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- IMPORTANT! All comments in this document are provided only for better understanding of the example(-s) provided. None of examples or comments can be used as the reference to the standard. ALWAYS follow the documentation of latest edig@s version available on www.edigas.org or any other official sources -->
+<ReverseAuctionSpecification_Document xmlns="urn:easee-gas.eu:edigas:CapacityAllocationReverseAuction:ReverseAuctionSpecificationDocument:6:1" schemaVersion="1">
+	<!-- must be an unique identification per message type, assigned by the sender of the message-->
+	<identification>001</identification>
+	<version>1</version>
+	<documentCode>AOE</documentCode>
+	<creationDateTime>2021-03-17T13:30:00Z</creationDateTime>
+	<validityPeriod>2021-03-19T05:00Z/2021-03-20T05:00Z</validityPeriod>
+	<issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+	<issuer_MarketParticipant.marketRole.roleCode>ZUJ</issuer_MarketParticipant.marketRole.roleCode>
+	<recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+	<recipient_MarketParticipant.marketRole.roleCode>ZUV</recipient_MarketParticipant.marketRole.roleCode>
+	<so_MarketParticipant.identification codingScheme="305">soCodeEIC</so_MarketParticipant.identification>
+	<auction_Period.timeInterval>2021-03-18T05:00Z/2021-03-19T02:00Z</auction_Period.timeInterval>
+	<reverseAuction_Transaction.transactionCode>ZSX</reverseAuction_Transaction.transactionCode>
+	<contract_Reference.identification>AUC-700442</contract_Reference.identification>
+	<contract_Reference.referenceCode>ZSF</contract_Reference.referenceCode>
+	<ConnectionPoint>
+		<identification codingScheme="305">ConnectionPntEIC</identification>
+		<availability.availabilityCodeTtype>Z06</availability.availabilityCodeTtype>
+		<quantity_MeasureUnit.unitOfMeasureCode>KW1</quantity_MeasureUnit.unitOfMeasureCode>
+		<Period>
+			<timeInterval>2021-03-19T05:00Z/2021-03-20T05:00Z</timeInterval>
+			<direction.gasDirectionCode>Z02</direction.gasDirectionCode>
+			<quantity.amount>1000</quantity.amount>
+		</Period>
+	</ConnectionPoint>
+</ReverseAuctionSpecification_Document>

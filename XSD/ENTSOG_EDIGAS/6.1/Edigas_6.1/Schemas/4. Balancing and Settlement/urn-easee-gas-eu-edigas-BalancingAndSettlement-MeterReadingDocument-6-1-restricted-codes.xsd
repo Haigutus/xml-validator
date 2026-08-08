@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ecl="urn:easee-gas.eu:edigas:codelistsV6" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<!-- import the codelsits -->
+	<xsd:import namespace="urn:easee-gas.eu:edigas:codelistsV6" schemaLocation="../cclib-v6/urn-easee-gas-eu-edigas-codelistsV6.xsd"/>
+	<!-- include the local message restrictions -->
+	<xsd:include schemaLocation="urn-easee-gas-eu-edigas-BalancingAndSettlement-MeterReadingDocument-6-1-local-restrictions.xsd"/>
+	<!--  restricted codelists  -->
+	<!-- CodingScheme type-->
+	<xsd:simpleType name="StandardRestrictedCodingSchemeCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardCodingSchemeCodeTypeCodeList">
+			<xsd:enumeration value="305"/>
+			<xsd:enumeration value="ZSO"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CodingSchemeCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedCodingSchemeCodeTypeCodeList LocalRestrictedCodingSchemeCodeTypeCodeList"/>
+	</xsd:simpleType>
+	<!-- Document type-->
+	<xsd:simpleType name="StandardRestrictedDocumentCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardDocumentCodeTypeCodeList">
+			<xsd:enumeration value="87G"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="DocumentCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedDocumentCodeTypeCodeList LocalRestrictedDocumentCodeTypeCodeList"/>
+	</xsd:simpleType>
+	<!-- GasDirection type-->
+	<xsd:simpleType name="StandardRestrictedGasDirectionCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardGasDirectionCodeTypeCodeList">
+			<xsd:enumeration value="Z02"/>
+			<xsd:enumeration value="Z03"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="GasDirectionCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedGasDirectionCodeTypeCodeList LocalRestrictedGasDirectionCodeTypeCodeList"/>
+	</xsd:simpleType>
+	<!-- Role type-->
+	<xsd:simpleType name="StandardRestrictedRoleCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardRoleCodeTypeCodeList">
+			<xsd:enumeration value="ZSO"/>
+			<xsd:enumeration value="ZAA"/>
+			<xsd:enumeration value="ZUE"/>
+			<xsd:enumeration value="ZSH"/>
+			<xsd:enumeration value="UD"/>			
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RoleCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedRoleCodeTypeCodeList LocalRestrictedRoleCodeTypeCodeList"/>
+	</xsd:simpleType>
+	<!-- Status type-->
+	<xsd:simpleType name="StandardRestrictedStatusCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardStatusCodeTypeCodeList">
+			<xsd:enumeration value="03G"/>
+			<xsd:enumeration value="04G"/>
+			<xsd:enumeration value="05G"/>
+			<xsd:enumeration value="58G"/>
+			<xsd:enumeration value="59G"/>
+			<xsd:enumeration value="60G"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="StatusCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedStatusCodeTypeCodeList LocalRestrictedStatusCodeTypeCodeList"/>
+	</xsd:simpleType>
+	<!-- PhysicalPropertyType type-->
+	<xsd:simpleType name="StandardRestrictedPhysicalPropertyCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardPhysicalPropertyCodeTypeCodeList">
+			<xsd:enumeration value="ZCA"/>
+			<xsd:enumeration value="ZCB"/>
+			<xsd:enumeration value="TC"/>
+			<xsd:enumeration value="ZCC"/>
+			<xsd:enumeration value="ZCD"/>
+			<xsd:enumeration value="ZLA"/>
+			<xsd:enumeration value="ZLB"/>
+			<xsd:enumeration value="ZPR"/>
+			<xsd:enumeration value="ZWQ"/>
+			<xsd:enumeration value="ZWP"/>						
+			<xsd:enumeration value="ZWO"/>
+			<xsd:enumeration value="ZVC"/>
+			<xsd:enumeration value="ZVR"/>						
+			<xsd:enumeration value="ZEC"/>																												
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PhysicalPropertyCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedPhysicalPropertyCodeTypeCodeList LocalRestrictedPhysicalPropertyCodeTypeCodeList"/>
+	</xsd:simpleType>
+	<!-- ChemicalCompound type-->	
+	<xsd:simpleType name="StandardRestrictedChemicalCompoundPropertyCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardChemicalCompoundPropertyCodeTypeCodeList">
+			<xsd:enumeration value="DN"/>
+			<xsd:enumeration value="DN1"/>
+			<xsd:enumeration value="ZGL"/>
+			<xsd:enumeration value="ZGK"/>
+			<xsd:enumeration value="ZN"/>
+			<xsd:enumeration value="ZNV"/>
+			<xsd:enumeration value="ZO"/>
+			<xsd:enumeration value="ZQD"/>
+			<xsd:enumeration value="ZQA"/>
+		    <xsd:enumeration value="ZQE"/>			
+		    <xsd:enumeration value="ZQB"/>			
+			<xsd:enumeration value="ZQF"/>
+			<xsd:enumeration value="ZQG"/>			
+			<xsd:enumeration value="ZQH"/>
+			<xsd:enumeration value="ZQI"/>
+			<xsd:enumeration value="ZQJ"/>			
+			<xsd:enumeration value="ZQK"/>			
+			<xsd:enumeration value="ZQN"/>
+			<xsd:enumeration value="ZS"/>	
+			<xsd:enumeration value="ZWI"/>					
+			<xsd:enumeration value="ZQO"/>
+			<xsd:enumeration value="ZQP"/>
+			<xsd:enumeration value="ZQQ"/>			
+			<xsd:enumeration value="ZQR"/>			
+			<xsd:enumeration value="ZQS"/>			
+			<xsd:enumeration value="ZQT"/>			
+			<xsd:enumeration value="ZQU"/>			
+			<xsd:enumeration value="ZQV"/>																		
+			<xsd:enumeration value="ZRA"/>																		
+			<xsd:enumeration value="ZRB"/>																		
+			<xsd:enumeration value="ZRC"/>																		
+			<xsd:enumeration value="ZRD"/>																		
+			<xsd:enumeration value="ZRE"/>																		
+			<xsd:enumeration value="ZQW"/>																		
+			<xsd:enumeration value="ZQX"/>																					
+		</xsd:restriction>							
+	</xsd:simpleType>
+	<xsd:simpleType name="ChemicalCompoundPropertyCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedChemicalCompoundPropertyCodeTypeCodeList LocalRestrictedChemicalCompoundPropertyCodeTypeCodeList"/>
+	</xsd:simpleType>
+	<!-- UnitOfMeasure type-->
+	<xsd:simpleType name="StandardRestrictedUnitOfMeasureCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardUnitOfMeasureCodeTypeCodeList">
+			<xsd:enumeration value="BAR"/>
+			<xsd:enumeration value="CEL"/>
+			<xsd:enumeration value="GP"/>
+			<xsd:enumeration value="JM"/>
+			<xsd:enumeration value="KC1"/>
+			<xsd:enumeration value="KMQ"/>
+			<xsd:enumeration value="KW1"/>
+			<xsd:enumeration value="KW2"/>
+			<xsd:enumeration value="KW3"/>
+			<xsd:enumeration value="MOL"/>
+			<xsd:enumeration value="MPA"/>
+			<xsd:enumeration value="MQ5"/>
+			<xsd:enumeration value="MQ6"/>
+			<xsd:enumeration value="MQ7"/>
+			<xsd:enumeration value="MQH"/>
+			<xsd:enumeration value="MTQ"/>
+			<xsd:enumeration value="P1"/>
+			<xsd:enumeration value="A06"/>
+			<xsd:enumeration value="A07"/>
+			<xsd:enumeration value="A09"/>	
+			<xsd:enumeration value="3B"/>			
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="UnitOfMeasureCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedUnitOfMeasureCodeTypeCodeList LocalRestrictedUnitOfMeasureCodeTypeCodeList"/>
+	</xsd:simpleType>
+</xsd:schema>

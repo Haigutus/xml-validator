@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<AccountInformationConfirmation_Document xmlns="urn:easee-gas.eu:edigas:General:AccountInformationConfirmationDocument:6:1" schemaVersion="1">
+    <identification>20201013A111122</identification>
+    <version>1</version>
+    <documentCode>AOD</documentCode><!-- AOD = Account information confirmation. -->
+    <creationDateTime>2020-12-01T18:13:51Z</creationDateTime>
+    <validityPeriod>2020-12-08T05:00Z/2020-12-09T05:00Z</validityPeriod>
+    <issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+    <issuer_MarketParticipant.marketRole.roleCode>ZUK</issuer_MarketParticipant.marketRole.roleCode>
+    <recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+    <recipient_MarketParticipant.marketRole.roleCode>ZSH</recipient_MarketParticipant.marketRole.roleCode>
+    <accountInformationRequest_Document.identification>20201013A111122</accountInformationRequest_Document.identification><!-- optional -->
+    <accountInformationRequest_Document.version>1</accountInformationRequest_Document.version><!-- optional -->
+    <ConnectionPoint>
+        <identification codingScheme="305">ConnectionPoint</identification>
+        <AccountOwner_MarketParticipant>
+            <identification codingScheme="305">Party-EIC</identification>
+            <owner_Status.statusCode>69G</owner_Status.statusCode><!-- 69G = Unknown market participant, optional -->
+            <Approved_Account>
+                <identification codingScheme="305">Example-Account</identification>
+                <accountTso codingScheme="305">Party-EIC</accountTso><!-- optional -->
+            </Approved_Account>
+            <Rejected_Account>
+                <identification codingScheme="305">Example-Account</identification>
+                <accountTso codingScheme="305">Party-EIC</accountTso><!-- optional -->
+            </Rejected_Account>
+        </AccountOwner_MarketParticipant>
+    </ConnectionPoint>
+</AccountInformationConfirmation_Document>

@@ -1,0 +1,11 @@
+Version 5.1
+===========
+
+Codelist
+-UnitOfMeasureTypeList   Added A15 (kg/h)
+
+Nomination and Matching
+-Added new unitCode (A15) to NOMINT document and restricted code list
+-Added new unitCode (A15) to NOMRES document and restricted code list
+-Added new unitCode (A15) to DELORD document and restricted code list
+-Added new unitCode (A15) to DELRES document and restricted code list

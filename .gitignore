@@ -157,6 +157,10 @@ ENV/
 env.bak/
 venv.bak/
 
+# uv
+# Keep uv.lock in git for reproducible deploys
+.python-version
+
 # Spyder project settings
 .spyderproject
 .spyproject

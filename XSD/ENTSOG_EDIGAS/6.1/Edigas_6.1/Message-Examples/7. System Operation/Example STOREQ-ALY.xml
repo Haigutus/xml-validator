@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<StorageActionRequest_Document  xmlns="urn:easee-gas.eu:edigas:SystemOperation:StorageActionRequestDocument:6:1" schemaVersion="1">
+  <identification>identification1</identification>
+  <version>1</version>
+  <documentCode>ALY</documentCode> <!-- Both BRP's in the transfer have to send this message to their storage operator -->
+  <creationDateTime>2021-09-12T01:01:00Z</creationDateTime>
+   <validityPeriod>2021-10-14T03:00Z/2021-10-14T04:00Z</validityPeriod>  
+  <issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+  <issuer_MarketParticipant.issuer_MarketRole.roleCode>ZSH</issuer_MarketParticipant.issuer_MarketRole.roleCode>
+  <recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+  <recipient_MarketParticipant.recipient_MarketRole.roleCode>ZUS</recipient_MarketParticipant.recipient_MarketRole.roleCode>
+  <ConnectionPoint>
+    <identification codingScheme="305">ConnectionPntEIC</identification>
+    <from_Account.identification codingScheme="305">from_Account.identification1</from_Account.identification>
+    <from_Account.accountCode>ZOE</from_Account.accountCode>
+    <to_Account.identification codingScheme="305">to_Account.identification1</to_Account.identification>
+    <to_Account.accountCode>ZOE</to_Account.accountCode>    
+    <product_Reference.identification>product_Reference.identification1</product_Reference.identification> <!-- Optional -->
+    <Transaction>
+      <identification>identification1</identification> <!-- Optional -->
+      <transactionCode>ZTG</transactionCode> <!-- Transfer of gas stock -->
+      <measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+      <Period>
+        <timeInterval>2021-10-14T03:00Z/2021-10-14T04:00Z</timeInterval>  <!-- Transfer of gas stock is valid at the end of the time interval provided-->
+        <quantity.amount>1000000</quantity.amount>
+      </Period>
+    </Transaction>  
+  </ConnectionPoint>  
+</StorageActionRequest_Document>

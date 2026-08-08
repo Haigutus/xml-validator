@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided only for better understanding of the example(-s) provided. None of examples or comments can be used as the reference to the standard. ALWAYS follow the documentation of latest edig@s version available on www.edigas.org or any other official sources -->
+<AuctionResults_Document xmlns="urn:easee-gas.eu:edigas:CapacityAllocationAuction:AuctionResultsDocument:6:1" schemaVersion="1">
+	<!-- must be an unique identification per message type, assigned by the sender of the message-->
+	<identification>001</identification>
+	<version>1</version>
+	<documentCode>ANA</documentCode>
+	<creationDateTime>2021-03-10T13:17:14Z</creationDateTime>
+	<validityPeriod>2021-03-11T05:00Z/2021-03-12T05:00Z</validityPeriod>
+	<issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+	<issuer_MarketParticipant.marketRole.roleCode>ZUJ</issuer_MarketParticipant.marketRole.roleCode>
+	<recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+	<recipient_MarketParticipant.marketRole.roleCode>ZUV</recipient_MarketParticipant.marketRole.roleCode>
+	<contract_Reference.identification>BookingID_001</contract_Reference.identification>
+	<contract_Reference.referenceCode>ZSD</contract_Reference.referenceCode>
+	<status.statusCode>64G</status.statusCode>
+	<product_PeriodSpan.periodSpanCode>ZEM</product_PeriodSpan.periodSpanCode>
+	<productTimeInterval_.timeInterval>2021-03-11T05:00Z/2021-03-12T05:00Z</productTimeInterval_.timeInterval>
+	<connectionPoint.identification codingScheme="305">ConnectionPntEIC</connectionPoint.identification>
+	<quantity_MeasureUnit.unitOfMeasureCode>KW1</quantity_MeasureUnit.unitOfMeasureCode>
+	<price_MeasureUnit.unitOfMeasureCode>KW1</price_MeasureUnit.unitOfMeasureCode>
+	<currency.currencyCode>EUR</currency.currencyCode>
+	<totalCapacityOffered_Quantity.amount>10000</totalCapacityOffered_Quantity.amount>
+	<totalCapacityOffered_Quantity.bundled_Indication.indicatorCode>01G</totalCapacityOffered_Quantity.bundled_Indication.indicatorCode>
+	<totalAllocated_Quantity.amount>1000</totalAllocated_Quantity.amount>
+	<totalAllocated_Quantity.bundled_Indication.indicatorCode>01G</totalAllocated_Quantity.bundled_Indication.indicatorCode>
+	<clearing_Price.amount>1.15</clearing_Price.amount>
+	<auctionHeld_Period.timeInterval>2021-03-10T11:00Z/2021-03-10T13:00Z</auctionHeld_Period.timeInterval>
+	<ToSo_MarketParticipant>
+		<identification codingScheme="305">toSoCodeEIC</identification>
+		<availability.availabilityCode>ZFB</availability.availabilityCode>
+		<price_MeasureUnit.unitOfMeasureCode>KW1</price_MeasureUnit.unitOfMeasureCode>
+		<currency.currencyCode>EUR</currency.currencyCode>
+		<premium_Price.amount>0.15</premium_Price.amount>
+		<reserve_Price.amount>0.50</reserve_Price.amount>
+	</ToSo_MarketParticipant>
+	<FromSo_MarketParticipant>
+		<identification codingScheme="305">fromSoCodeEIC</identification>
+		<availability.availabilityCode>ZFB</availability.availabilityCode>
+		<price_MeasureUnit.unitOfMeasureCode>KW1</price_MeasureUnit.unitOfMeasureCode>
+		<currency.currencyCode>EUR</currency.currencyCode>
+		<premium_Price.amount>0.15</premium_Price.amount>
+		<reserve_Price.amount>0.35</reserve_Price.amount>
+	</FromSo_MarketParticipant>
+	<BiddingRound_Sequence>
+		<position>1</position>
+		<Bid_Document>
+			<identification>001</identification>
+			<version>1</version>
+			<bid_MarketParticipant.identification codingScheme="305">AUCBID_IssuerEIC</bid_MarketParticipant.identification>
+			<bidder_Reference.identification>BidderID</bidder_Reference.identification>
+			<bid_Quantity.amount>1000</bid_Quantity.amount>
+			<bid_Quantity.bundled_Indication.indicatorCode>01G</bid_Quantity.bundled_Indication.indicatorCode>
+			<allocated_Quantity.amount>1000</allocated_Quantity.amount>
+			<allocated_Quantity.bundled_Indication.indicatorCode>01G</allocated_Quantity.bundled_Indication.indicatorCode>
+			<auctionBooking_Reference.identification>BookingID_001</auctionBooking_Reference.identification>
+			<bid_Price.amount>1.5678</bid_Price.amount>
+			<status.statusCode>64G</status.statusCode>
+		</Bid_Document>
+	</BiddingRound_Sequence>
+</AuctionResults_Document>

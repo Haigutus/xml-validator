@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<AccountInformationRequest_Document xmlns="urn:easee-gas.eu:edigas:General:AccountInformationRequestDocument:6:1" schemaVersion="1">
+    <identification>20201013A111122</identification>
+    <version>1</version>
+    <documentCode>AOC</documentCode> <!-- AOC = Account information request. -->
+    <creationDateTime>2020-12-01T18:13:51Z</creationDateTime>
+    <validityPeriod>2020-12-08T05:00Z/2020-12-09T05:00Z</validityPeriod>
+    <issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+    <issuer_MarketParticipant.marketRole.roleCode>ZSH</issuer_MarketParticipant.marketRole.roleCode>
+    <recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+    <recipient_MarketParticipant.marketRole.roleCode>ZUK</recipient_MarketParticipant.marketRole.roleCode>
+    <ConnectionPoint>
+        <identification codingScheme="305">ConnectionPoint</identification>
+        <AccountOwner_MarketParticipant>
+            <identification codingScheme="305">Party-EIC-Code</identification>
+            <RequestForValidation_Account>
+                <identification codingScheme="305">Example-Account</identification>
+                <accountTso codingScheme="305">Party-EIC-Code</accountTso><!-- optional -->
+            </RequestForValidation_Account>
+        </AccountOwner_MarketParticipant>
+    </ConnectionPoint>
+</AccountInformationRequest_Document>

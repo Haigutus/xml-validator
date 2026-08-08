@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<MarketSituation_Document xmlns="urn:easee-gas.eu:edigas:BalancingAndSettlement:MarketSituationDocument:6:1"  schemaVersion="1">
+	<identification>MARSIT20210113A00001</identification>
+	<version>1</version>
+	<documentCode>AOA</documentCode>
+	<creationDateTime>2020-12-08T13:32:43Z</creationDateTime>
+	<validityPeriod>2020-12-07T05:00Z/2020-12-08T05:00Z</validityPeriod>
+	<!-- add optional applicationContext -->
+	<issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+	<issuer_MarketParticipant.marketRole.roleCode>ZUK</issuer_MarketParticipant.marketRole.roleCode>
+	<recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+	<recipient_MarketParticipant.marketRole.roleCode>ZSH</recipient_MarketParticipant.marketRole.roleCode>
+	<MarketArea>
+		<identification codingScheme="305">MarketAreaEIC1</identification>    		<!-- use EIC Y-code -->
+		<Account>
+			<identification codingScheme="ZSO">BRPAccountEIC</identification>   <!-- EIC Account Y code or ZSO -->
+			<accountCode>ZOE</accountCode>
+			<accountTso codingScheme="305">TSOEICcode</accountTso> <!-- use EIC Y-code if TSO account is needed -->
+			<TimeSeries>
+				<businessCode>Z01</businessCode>
+				<measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+				<currency.currencyCode>EUR</currency.currencyCode>
+				<Transaction>
+					<identification>TRANSACTION1</identification>
+					<transactionCode>A03</transactionCode>
+					<Period>
+						<timeInterval>2020-12-07T05:00Z/2020-12-08T05:00Z</timeInterval>
+						<status.statusCode>04G</status.statusCode>
+						<accountDirection.accountDirectionCode>ZPE</accountDirection.accountDirectionCode>  <!-- ZPE : Area Coordinator is buying gas from the BRP -->
+						<accountDirection.account_Quantity.amount>100</accountDirection.account_Quantity.amount>
+						<price.amount>0.136</price.amount>
+					</Period>
+				</Transaction>
+			</TimeSeries>
+		</Account>
+	</MarketArea>
+</MarketSituation_Document>

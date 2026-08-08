@@ -1,0 +1,9 @@
+Version 5.1
+===========
+
+Codelist
+-CodingSchemeTypeList   Added back A01 (to be deprecated) 
+-QuantityTypeCodeList     Added ZVC, ZVR, ZEC, ZQR, ZYH, ZYI
+
+Balancing and Settlement (METRED)
+-Added new quantityCodes to METRED document.

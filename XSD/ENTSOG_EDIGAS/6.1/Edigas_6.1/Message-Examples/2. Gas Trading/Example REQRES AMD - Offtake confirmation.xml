@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<RequestResponse_Document xmlns="urn:easee-gas.eu:edigas:GasTradingOtc:RequestResponseDocument:6:1" schemaVersion="1">
+    <identification>20201013A123777</identification>
+    <version>1</version>
+    <documentCode>AMD</documentCode><!-- AMD = Offtake confirmation -->
+    <creationDateTime>2020-10-12T12:30:51Z</creationDateTime>
+    <validityPeriod>2020-10-13T04:00Z/2020-10-14T04:00Z</validityPeriod>
+    <issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+    <issuer_MarketParticipant.marketRole.roleCode>ZSH</issuer_MarketParticipant.marketRole.roleCode>
+    <recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+    <recipient_MarketParticipant.marketRole.roleCode>ZSH</recipient_MarketParticipant.marketRole.roleCode>
+    <contract_Reference.identification>Example-ContractReference</contract_Reference.identification>
+    <request_Document.identification>20201013A123456</request_Document.identification><!-- Mandatory if the Request document is used. -->
+    <request_Document.version>1</request_Document.version><!-- Mandatory if the Request document is used. -->
+    <ConnectionPoint>
+       <identification codingScheme="305">ConnectionPoint</identification>
+        <Account>
+            <internalAccount codingScheme="305">Example-InternalAccount-EIC-Code</internalAccount>
+            <internalAccountTso codingScheme="ZSO">TSO-Code</internalAccountTso>
+            <externalAccount codingScheme="305">Example-ExternalAccount-EIC-Code</externalAccount>
+            <externalAccountTso codingScheme="ZSO">TSO-Code</externalAccountTso>            
+             <QuantityCode_Composition>
+                <quantityCodeType>Z36</quantityCodeType><!-- Z36 = Balance Responsible Party offtake/delivery. -->
+                 <measureUnit.unitOfMeasureCode>KW1</measureUnit.unitOfMeasureCode>
+                <direction.gasDirectionCode>Z02</direction.gasDirectionCode>
+                <Period>
+                    <timeInterval>2020-10-13T04:00Z/2020-10-14T04:00Z</timeInterval>
+                    <quantity.amount>10000</quantity.amount>
+                </Period>
+            </QuantityCode_Composition>       
+        </Account> 
+   </ConnectionPoint>
+</RequestResponse_Document>

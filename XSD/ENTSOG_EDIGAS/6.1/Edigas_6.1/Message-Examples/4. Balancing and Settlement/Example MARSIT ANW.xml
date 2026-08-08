@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<MarketSituation_Document xmlns="urn:easee-gas.eu:edigas:BalancingAndSettlement:MarketSituationDocument:6:1"   schemaVersion="1">
+	<identification>MARSIT20210113A00001</identification>
+	<version>1</version>
+	<documentCode>ANW</documentCode>
+	<creationDateTime>2021-01-13T10:30:47Z</creationDateTime>
+	<validityPeriod>2021-01-14T05:00Z/2021-01-15T05:00Z</validityPeriod>
+	<!-- add optional applicationContext -->
+	<issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification> <!-- use EIC X-code -->
+	<issuer_MarketParticipant.marketRole.roleCode>ZUK</issuer_MarketParticipant.marketRole.roleCode>   <!-- use ZUK or ZSO -->
+	<recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification> <!-- use EIC X-code -->
+	<recipient_MarketParticipant.marketRole.roleCode>ZSH</recipient_MarketParticipant.marketRole.roleCode>   <!-- use ZSH or ZUK -->
+	<MarketArea>
+		<identification codingScheme="305">MarketAreaEIC</identification> 	<!-- use EIC Y-code -->
+		<ConnectionPoint>
+			<identification codingScheme="305">ConnectionPntEIC1</identification> 		<!-- use 305 Z-code or Y-code  or ZSO-code -->
+			<Account>
+				<identification codingScheme="ZSO">ACCOUNT</identification>		<!-- use EIC Y-code or ZSO-code-->
+				<accountCode>ZOE</accountCode>
+				<!-- add optional accountTso , when used use EIC X-code-->
+				<TimeSeries>
+					<businessCode>Z01</businessCode>
+					<measureUnit.unitOfMeasureCode>KW2</measureUnit.unitOfMeasureCode>
+					<Period>
+						<timeInterval>2021-01-14T05:00Z/2021-01-15T05:00Z</timeInterval>
+						<accountDirection.accountDirectionCode>ZPD</accountDirection.accountDirectionCode>
+						<accountDirection.account_Quantity.amount>1234</accountDirection.account_Quantity.amount>
+					</Period>
+				</TimeSeries>
+			</Account>
+		</ConnectionPoint>
+	</MarketArea>
+</MarketSituation_Document>

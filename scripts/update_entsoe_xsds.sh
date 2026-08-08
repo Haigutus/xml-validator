@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Download the latest ENTSO-E ESMP / CIM XSD package into XSD/ without removing older packages.
+# Replace XSD/ENTSOE_ESMP with the latest ENTSO-E ESMP / CIM XSD package.
 #
 # Usage:
 #   ./scripts/update_entsoe_xsds.sh
@@ -10,8 +10,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-mkdir -p XSD
 
+DEST="XSD/ENTSOE_ESMP"
 DEFAULT_URL="https://www.entsoe.eu/Documents/EDI/Library/CIM_xsd_package_v2026.7z"
 ENTSOE_XSD_URL="${ENTSOE_XSD_URL:-$DEFAULT_URL}"
 
@@ -19,72 +19,70 @@ TMPDIR="$(mktemp -d)"
 trap 'rm -rf "$TMPDIR"' EXIT
 
 ARCHIVE="$TMPDIR/package"
-echo "==> Downloading ENTSO-E CIM/ESMP XSDs"
-echo "    $ENTSOE_XSD_URL"
-if command -v curl >/dev/null 2>&1; then
-  curl -fsSL -o "$ARCHIVE" "$ENTSOE_XSD_URL"
-elif command -v wget >/dev/null 2>&1; then
-  wget -q -O "$ARCHIVE" "$ENTSOE_XSD_URL"
-else
-  echo "ERROR: need curl or wget" >&2
-  exit 1
-fi
-
-# Derive folder name from URL filename
-base="$(basename "$ENTSOE_XSD_URL")"
-base="${base%%\?*}"
-name="${base%.*}"   # strip .7z / .zip
-# Prefer a stable prefix
-dest_name="ENTSOE_${name}"
-DEST="XSD/${dest_name}"
-
-if [[ -d "$DEST" ]]; then
-  echo "==> Destination already exists: $DEST"
-  echo "    Skipping extract (delete the folder to re-download)."
-  exit 0
-fi
-
 EXTRACT="$TMPDIR/extract"
 mkdir -p "$EXTRACT"
 
-_extract() {
-  local kind
-  kind="$(file -b "$ARCHIVE" 2>/dev/null || echo unknown)"
-  case "$kind" in
-    *7-zip*|*7z*)
-      if ! command -v 7z >/dev/null 2>&1 && ! command -v 7za >/dev/null 2>&1; then
-        echo "ERROR: need p7zip (7z) for .7z archives" >&2
-        exit 1
-      fi
-      "$(command -v 7z || command -v 7za)" x -y -o"$EXTRACT" "$ARCHIVE" >/dev/null
-      ;;
-    *Zip*|*zip*)
-      unzip -qo "$ARCHIVE" -d "$EXTRACT"
-      ;;
-    *)
-      if command -v 7z >/dev/null 2>&1 || command -v 7za >/dev/null 2>&1; then
-        "$(command -v 7z || command -v 7za)" x -y -o"$EXTRACT" "$ARCHIVE" >/dev/null
-      else
-        unzip -qo "$ARCHIVE" -d "$EXTRACT"
-      fi
-      ;;
-  esac
-}
-
-_extract
-
-mkdir -p "$DEST"
-shopt -s nullglob
-# If archive has a single top-level directory, use its contents
-tops=("$EXTRACT"/*)
-if ((${#tops[@]} == 1)) && [[ -d "${tops[0]}" ]]; then
-  # If it already looks like CIM_*, keep that name as subfolder note in README via dest_name
-  mv "${tops[0]}"/* "$DEST/" 2>/dev/null || mv "${tops[0]}" "$DEST/content"
+echo "==> Downloading ENTSO-E ESMP / CIM XSDs"
+echo "    $ENTSOE_XSD_URL"
+if command -v curl >/dev/null 2>&1; then
+  curl -fsSL -o "$ARCHIVE" "$ENTSOE_XSD_URL"
 else
-  mv "$EXTRACT"/* "$DEST/" 2>/dev/null || true
+  wget -q -O "$ARCHIVE" "$ENTSOE_XSD_URL"
 fi
 
+_extract_7z() {
+  if command -v 7z >/dev/null 2>&1 || command -v 7za >/dev/null 2>&1; then
+    "$(command -v 7z || command -v 7za)" x -y -o"$EXTRACT" "$ARCHIVE" >/dev/null
+    return
+  fi
+  if command -v uv >/dev/null 2>&1; then
+    echo "    (extracting with uv + py7zr)"
+    uv run --with py7zr python - "$ARCHIVE" "$EXTRACT" <<'PY'
+import sys
+from pathlib import Path
+import py7zr
+archive, out = Path(sys.argv[1]), Path(sys.argv[2])
+out.mkdir(parents=True, exist_ok=True)
+with py7zr.SevenZipFile(archive, mode="r") as z:
+    z.extractall(path=out)
+PY
+    return
+  fi
+  echo "ERROR: need p7zip (7z) or uv for .7z" >&2
+  exit 1
+}
+
+kind="$(file -b "$ARCHIVE" 2>/dev/null || echo unknown)"
+case "$kind" in
+  *7-zip*|*7z*) _extract_7z ;;
+  *Zip*|*zip*)  unzip -qo "$ARCHIVE" -d "$EXTRACT" ;;
+  *)            _extract_7z ;;
+esac
+
+chmod -R u+rwX "$EXTRACT" 2>/dev/null || true
+
+# Unwrap single-directory wrappers
+cur="$EXTRACT"
+for _ in 1 2 3; do
+  shopt -s nullglob
+  tops=("$cur"/*)
+  if ((${#tops[@]} == 1)) && [[ -d "${tops[0]}" ]] && ! compgen -G "$cur"/*.xsd > /dev/null; then
+    cur="${tops[0]}"
+  else
+    break
+  fi
+done
+
+rm -rf "$DEST"
+mkdir -p "$DEST"
+cp -a "$cur"/. "$DEST"/
+chmod -R u+rwX "$DEST" 2>/dev/null || true
+
+{
+  echo "source_url=$ENTSOE_XSD_URL"
+  echo "fetched_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+} > "$DEST/.package_source"
+
 count="$(find "$DEST" -name '*.xsd' | wc -l | tr -d ' ')"
-echo "==> Installed $count XSD file(s) -> $DEST"
-echo "    Older ENTSO-E trees (e.g. XSD/CIM_*) were left unchanged."
-echo "    Restart the app to rebuild the in-memory XSD index."
+echo "==> Replaced $DEST ($count XSD file(s))"
+echo "    Restart the app to rebuild the XSD index."

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided only for better understanding of the example(-s) provided. None of examples or comments can be used as the reference to the standard. ALWAYS follow the documentation of latest edig@s version available on www.edigas.org or any other official sources -->
+<LoadForecastConfirmation_Document xmlns="urn:easee-gas.eu:edigas:General:LoadForecastConfirmationDocument:6:1" schemaVersion="1" >
+	<identification>PROCON-TRADE</identification>
+	<version>999</version>
+	<documentCode>ALK</documentCode>
+	<creationDateTime>2001-12-17T09:30:47Z</creationDateTime>
+	<validityPeriod>2022-10-01T04:00Z/2022-10-02T04:00Z</validityPeriod>
+    <contract_Reference.identification>ContractReference</contract_Reference.identification>
+    <contract_Reference.referenceCode>CT</contract_Reference.referenceCode>								  
+	<issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+	<issuer_MarketParticipant.issuer_MarketRole.roleCode>ZSO</issuer_MarketParticipant.issuer_MarketRole.roleCode>
+	<recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+	<recipient_MarketParticipant.recipient_MarketRole.roleCode>ZSH</recipient_MarketParticipant.recipient_MarketRole.roleCode>
+	<proDoc_Document.identification>Document-Number</proDoc_Document.identification>
+	<proDoc_Document.version>999</proDoc_Document.version>
+	<ConnectionPoint>
+		<identification codingScheme="305">ConnectionPntEIC</identification>
+		<measureUnit.unitOfMeasureCode>KW1</measureUnit.unitOfMeasureCode>
+		<Account>
+			<identification codingScheme="ZSO">GSTPTRADE</identification>
+			<accountCode>ZOC</accountCode>
+			<Period>
+				<timeInterval>2022-10-01T04:00Z/2022-10-02T04:00Z</timeInterval>
+				<direction.gasDirectionCode>Z03</direction.gasDirectionCode>
+				<quantity.amount>0</quantity.amount>
+				<Reason>
+					<reasonCode>82G</reasonCode>
+					<text>a</text>
+				</Reason>
+			</Period>
+		</Account>
+		<Account>
+			<identification codingScheme="ZSO">GSTPD</identification>
+			<accountCode>ZOC</accountCode>
+			<Period>
+				<timeInterval>2022-10-01T04:00Z/2022-10-02T04:00Z</timeInterval>
+				<direction.gasDirectionCode>Z03</direction.gasDirectionCode>
+				<quantity.amount>0</quantity.amount>
+				<Reason>
+					<reasonCode>82G</reasonCode>
+					<text>a</text>
+				</Reason>
+			</Period>
+		</Account>
+		<Account>
+			<identification codingScheme="ZSO">GSTPVPPVEN</identification>
+			<accountCode>ZOC</accountCode>
+			<Period>
+				<timeInterval>2022-10-01T04:00Z/2022-10-02T04:00Z</timeInterval>
+				<direction.gasDirectionCode>Z03</direction.gasDirectionCode>
+				<quantity.amount>0</quantity.amount>
+				<Reason>
+					<reasonCode>82G</reasonCode>
+					<text>a</text>
+				</Reason>
+			</Period>
+		</Account>
+		<Account>
+			<identification codingScheme="ZSO">GSTPVPPVEX</identification>
+			<accountCode>ZOC</accountCode>
+			<Period>
+				<timeInterval>2022-10-01T04:00Z/2022-10-02T04:00Z</timeInterval>
+				<direction.gasDirectionCode>Z03</direction.gasDirectionCode>
+				<quantity.amount>0</quantity.amount>
+				<Reason>
+					<reasonCode>82G</reasonCode>
+					<text>a</text>
+				</Reason>
+			</Period>
+		</Account>
+	</ConnectionPoint>
+</LoadForecastConfirmation_Document>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- IMPORTANT! All comments in this document are provided only for better understanding of the example(-s) provided. None of examples or comments can be used as the reference to the standard. ALWAYS follow the documentation of latest edig@s version available on www.edigas.org or any other official sources -->
+<MarketOfferedCapacity_Document xmlns="urn:easee-gas.eu:edigas:CapacityAllocationInitialisation:MarketOfferedCapacityDocument:6:1" schemaVersion="1">
+	<!-- must be an unique identification per message type, assigned by the sender of the message-->
+	<identification>001</identification>
+	<version>1</version>
+	<documentCode>AMX</documentCode>
+	<creationDateTime>2021-03-17T13:17:14Z</creationDateTime>
+	<validityPeriod>2021-03-18T05:00Z/2021-03-19T05:00Z</validityPeriod>
+	<issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+	<issuer_MarketParticipant.marketRole.roleCode>ZUJ</issuer_MarketParticipant.marketRole.roleCode>
+	<recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+	<recipient_MarketParticipant.marketRole.roleCode>ZUV</recipient_MarketParticipant.marketRole.roleCode>
+	<status.statusCode>62G</status.statusCode>
+		<ProductIdentification_Reference>
+		<!-->The identifaction of the product to be auctioned-->
+		<identification>MCAP111222</identification>
+		<referenceCode>ZSD</referenceCode>
+		<ConnectionPoint>
+			<identification codingScheme="305">ConnectionPntEIC</identification>
+			<product_PeriodSpan.periodSpanCode>ZEM</product_PeriodSpan.periodSpanCode>
+			<quantity_MeasureUnit.unitOfMeasureCode>KW1</quantity_MeasureUnit.unitOfMeasureCode>
+			<price_MeasureUnit.unitOfMeasureCode>KW1</price_MeasureUnit.unitOfMeasureCode>
+			<currency.currencyCode>EUR</currency.currencyCode>
+			<reserve_Price.amount>0.001134</reserve_Price.amount>
+			<period.timeInterval>2021-03-18T05:00Z/2021-03-19T05:00Z</period.timeInterval>
+			<period.auction_Quantity.amount>500000</period.auction_Quantity.amount>
+			<period.auction_Quantity.bundled_Indication.indicatorCode>01G</period.auction_Quantity.bundled_Indication.indicatorCode>
+			<ToSo_MarketParticipant>
+				<identification codingScheme="305">toSoCodeEIC</identification>
+				<reserve_Price.amount>0.076943</reserve_Price.amount>
+				<price_MeasureUnit.unitOfMeasureCode>KW1</price_MeasureUnit.unitOfMeasureCode>
+				<currency.currencyCode>EUR</currency.currencyCode>
+				<availability.availabilityCode>Z06</availability.availabilityCode>
+			</ToSo_MarketParticipant>
+			<FromSo_MarketParticipant>
+				<identification codingScheme="305">fromSoCodeEIC</identification>
+				<reserve_Price.amount>0.076000</reserve_Price.amount>
+				<price_MeasureUnit.unitOfMeasureCode>KW1</price_MeasureUnit.unitOfMeasureCode>
+				<currency.currencyCode>EUR</currency.currencyCode>
+				<availability.availabilityCode>Z06</availability.availabilityCode>
+			</FromSo_MarketParticipant>
+		</ConnectionPoint>
+	</ProductIdentification_Reference>
+</MarketOfferedCapacity_Document>

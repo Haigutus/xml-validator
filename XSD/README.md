@@ -1,25 +1,25 @@
 # XSD registry
 
-All schemas used for auto-validation (match by XML root `targetNamespace`).
+Schemas used for auto-validation (match by XML root namespace).
 
-**Old packages are never deleted by update scripts** — new downloads get versioned folder names.
+## Maintained packs (replaced in place by update scripts)
 
-## Bundled (committed in git)
+| Path | Family | Update script |
+|------|--------|---------------|
+| `ENTSOE_ESMP/` | ENTSO-E IEC 62325 / ESMP market XSDs | `scripts/update_entsoe_xsds.sh` |
+| `ENTSOG_EDIGAS/5.1/` | Edig@s 5.1 full package | `scripts/update_edigas_xsds.sh 5.1` |
+| `ENTSOG_EDIGAS/6.1/` | Edig@s 6.1 full package | `scripts/update_edigas_xsds.sh 6.1` |
 
-| Path | Family | Notes |
-|------|--------|--------|
-| `CIM_2021-04-11/` | ENTSO-E IEC 62325 / ESMP | Legacy snapshot |
-| `EAP-Schemas/` | Edig@s ~5.1 | Legacy snapshot (codelists ~2018) |
-| `CGMES_2_4_15/` | CGMES FullModel / RDF helpers | Static |
-| `OPDM_XSD/` | OPDM QAR / query | Static |
-| `urn-entsoe-eu-wgedi-rgce-reporting_schemas-2-0/` | RGCE reporting | Static |
+Each pack may contain a `.package_source` file with download URL and fetch time.
 
-## After running update scripts
+**Updates wipe and recreate only the target folder** — no date-stamped copies.
 
-| Path pattern | Family | Script |
-|--------------|--------|--------|
-| `ENTSOE_CIM_xsd_package_vYYYY/` | ENTSO-E CIM/ESMP latest | `scripts/update_entsoe_xsds.sh` |
-| `EDIGAS_5.1_YYYY-MM-DD/` | Edig@s 5.1 full package | `scripts/update_edigas_xsds.sh` |
-| `EDIGAS_6.1_YYYY-MM-DD/` | Edig@s 6.1 full package | `scripts/update_edigas_xsds.sh` |
+## Other bundled packs (manual / static)
 
-See root [README.md](../README.md#updating-the-xsd-registry) for commands.
+| Path | Notes |
+|------|--------|
+| `CGMES_2_4_15/` | CGMES FullModel / RDF helpers |
+| `OPDM_XSD/` | OPDM QAR / query |
+| `urn-entsoe-eu-wgedi-rgce-reporting_schemas-2-0/` | RGCE reporting |
+
+See root [README.md](../README.md#updating-the-xsd-registry).

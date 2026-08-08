@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<MarketSituation_Document xmlns="urn:easee-gas.eu:edigas:BalancingAndSettlement:MarketSituationDocument:6:1"  schemaVersion="1">
+	<identification>MARSIT20210113A00001</identification>
+	<version>1</version>
+	<documentCode>AOB</documentCode>
+	<creationDateTime>2020-12-07T13:32:43Z</creationDateTime>
+	<validityPeriod>2020-12-07T05:00Z/2020-12-08T05:00Z</validityPeriod>
+	<!-- add optional applicationContext -->
+	<issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+	<issuer_MarketParticipant.marketRole.roleCode>ZUK</issuer_MarketParticipant.marketRole.roleCode>
+	<recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+	<recipient_MarketParticipant.marketRole.roleCode>ZSH</recipient_MarketParticipant.marketRole.roleCode>
+	<MarketArea>
+		<identification codingScheme="305">MarketAreaEIC1</identification>    		<!-- use EIC Y-code -->
+		<TimeSeries>
+			<businessCode>Z46</businessCode>
+			<measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+			<Period>
+				<timeInterval>2020-12-07T05:00Z/2020-12-07T06:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>1059995</quantity.amount>    <!-- one amount for clarity, in general not every hour will have the same amount -->
+				<quantity.direction.gasDirectionCode>Z02</quantity.direction.gasDirectionCode>
+			</Period>
+		<!-- more hours in the day -->	
+			<Period>
+				<timeInterval>2020-12-07T13:00Z/2020-12-08T05:00Z</timeInterval>
+				<status.statusCode>03G</status.statusCode>
+				<quantity.amount>23547158</quantity.amount>    <!-- one amount for clarity, in general not every hour will have the same amount -->
+				<quantity.direction.gasDirectionCode>Z02</quantity.direction.gasDirectionCode>
+			</Period>
+		</TimeSeries>
+		<TimeSeries>
+			<businessCode>Z44</businessCode>             <!-- first lower limit -->
+			<measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+			<Period>
+				<timeInterval>2020-12-07T05:00Z/2020-12-07T06:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>1</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z02</quantity.direction.gasDirectionCode>
+			</Period>
+			<!-- more hours in the day -->			
+			<Period>
+				<timeInterval>2020-12-08T04:00Z/2020-12-08T05:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>1</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z03</quantity.direction.gasDirectionCode>
+			</Period>
+		</TimeSeries>
+		<TimeSeries>
+			<businessCode>Z45</businessCode>             <!-- first upper limit -->
+			<measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+			<Period>
+				<timeInterval>2020-12-07T05:00Z/2020-12-07T06:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>1</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z03</quantity.direction.gasDirectionCode>
+			</Period>
+<!-- more hours in the day -->			
+			<Period>
+				<timeInterval>2020-12-08T04:00Z/2020-12-08T05:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>1</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z03</quantity.direction.gasDirectionCode>
+			</Period>
+		</TimeSeries>
+		<TimeSeries>
+			<businessCode>Z44</businessCode>           <!-- second lower limit -->
+			<measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+			<Period>
+				<timeInterval>2020-12-07T05:00Z/2020-12-07T06:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>2</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z02</quantity.direction.gasDirectionCode>
+			</Period>
+	<!-- more hours in the day -->	
+			<Period>
+				<timeInterval>2020-12-08T04:00Z/2020-12-08T05:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>2</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z02</quantity.direction.gasDirectionCode>
+			</Period>
+		</TimeSeries>
+		<TimeSeries>
+			<businessCode>Z45</businessCode>          <!-- second upper limit -->
+			<measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+			<Period>
+				<timeInterval>2020-12-07T05:00Z/2020-12-07T06:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>2</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z03</quantity.direction.gasDirectionCode>
+			</Period>
+	<!-- more hours in the day -->	
+			<Period>
+				<timeInterval>2020-12-08T04:00Z/2020-12-08T05:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>2</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z03</quantity.direction.gasDirectionCode>
+			</Period>
+		</TimeSeries>
+	</MarketArea>
+	<MarketArea>
+		<identification codingScheme="305">MarketAreaEIC2</identification>
+		<TimeSeries>
+			<businessCode>Z46</businessCode>
+			<measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+			<Period>
+				<timeInterval>2020-12-07T05:00Z/2020-12-07T06:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>1059995</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z02</quantity.direction.gasDirectionCode>
+			</Period>
+	<!-- more hours in the day -->	
+			<Period>
+				<timeInterval>2020-12-08T04:00Z/2020-12-08T05:00Z</timeInterval>
+				<status.statusCode>03G</status.statusCode>
+				<quantity.amount>8681173</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z03</quantity.direction.gasDirectionCode>
+			</Period>
+		</TimeSeries>
+		<TimeSeries>
+			<businessCode>Z44</businessCode>             <!-- first lower limit -->
+			<measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+			<Period>
+				<timeInterval>2020-12-07T05:00Z/2020-12-07T06:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>3</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z02</quantity.direction.gasDirectionCode>
+			</Period>
+<!-- more hours in the day -->			
+			<Period>
+				<timeInterval>2020-12-08T04:00Z/2020-12-08T05:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>3</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z03</quantity.direction.gasDirectionCode>
+			</Period>
+		</TimeSeries>
+		<TimeSeries>
+			<businessCode>Z45</businessCode>             <!-- first upper limit -->
+			<measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+			<Period>
+				<timeInterval>2020-12-07T05:00Z/2020-12-07T06:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>3</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z03</quantity.direction.gasDirectionCode>
+			</Period>
+<!-- more hours in the day -->			
+			<Period>
+				<timeInterval>2020-12-08T04:00Z/2020-12-08T05:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>3</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z03</quantity.direction.gasDirectionCode>
+			</Period>
+		</TimeSeries>
+		<TimeSeries>
+			<businessCode>Z44</businessCode>           <!-- second lower limit -->
+			<measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+			<Period>
+				<timeInterval>2020-12-07T05:00Z/2020-12-07T06:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>4</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z02</quantity.direction.gasDirectionCode>
+			</Period>
+	<!-- more hours in the day -->	
+			<Period>
+				<timeInterval>2020-12-08T04:00Z/2020-12-08T05:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>4</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z02</quantity.direction.gasDirectionCode>
+			</Period>
+		</TimeSeries>
+		<TimeSeries>
+			<businessCode>Z45</businessCode>          <!-- second upper limit -->
+			<measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+			<Period>
+				<timeInterval>2020-12-07T05:00Z/2020-12-07T06:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>4</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z03</quantity.direction.gasDirectionCode>
+			</Period>
+	<!-- more hours in the day -->	
+			<Period>
+				<timeInterval>2020-12-08T04:00Z/2020-12-08T05:00Z</timeInterval>
+				<status.statusCode>05G</status.statusCode>
+				<quantity.amount>4</quantity.amount>
+				<quantity.direction.gasDirectionCode>Z03</quantity.direction.gasDirectionCode>
+			</Period>
+		</TimeSeries>
+	</MarketArea>
+</MarketSituation_Document>

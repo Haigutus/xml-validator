@@ -131,7 +131,7 @@ def on_xml(content):
     return log, _annotations(result["errors"])
 
 
-if __name__ == "__main__":
+def main():
     port = int(os.getenv("PORT", "8030"))
     # No devtools; silence any version-check against plotly CDN
     app.run(
@@ -140,3 +140,7 @@ if __name__ == "__main__":
         port=port,
         dev_tools_disable_version_check=True,
     )
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ecl="urn:easee-gas.eu:edigas:codelistsV6" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<!-- import the codelsits -->
+	<xsd:import namespace="urn:easee-gas.eu:edigas:codelistsV6" schemaLocation="../cclib-v6/urn-easee-gas-eu-edigas-codelistsV6.xsd"/>
+	<!-- include the local message restrictions -->
+	<xsd:include schemaLocation="urn-easee-gas-eu-edigas-RemitAndTransparency-TransparencyPublicationDocument-6-1-local-restrictions.xsd"/>
+	<!--  restricted codelists  -->
+	<!-- Business type-->
+	<xsd:simpleType name="StandardRestrictedBusinessCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardBusinessCodeTypeCodeList">
+			<xsd:enumeration value="Z02"/>
+			<xsd:enumeration value="Z12"/>
+			<xsd:enumeration value="Z15"/>
+			<xsd:enumeration value="ZEY"/>
+			<xsd:enumeration value="ZFA"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="BusinessCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedBusinessCodeTypeCodeList LocalRestrictedBusinessCodeTypeCodeList"/>
+	</xsd:simpleType>
+	<!-- Availability type-->
+	<xsd:simpleType name="StandardRestrictedAvailabilityCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardAvailabilityCodeTypeCodeList">
+			<xsd:enumeration value="Z05"/>
+			<xsd:enumeration value="Z06"/>
+			<xsd:enumeration value="Z07"/>			
+			<xsd:enumeration value="Z13"/>
+			<xsd:enumeration value="ZEW"/>			
+			<xsd:enumeration value="ZEZ"/>			
+			<xsd:enumeration value="ZFA"/>
+			<xsd:enumeration value="ZFB"/>
+			<xsd:enumeration value="ZFC"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AvailabilityCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedAvailabilityCodeTypeCodeList LocalRestrictedAvailabilityCodeTypeCodeList"/>
+	</xsd:simpleType>
+	<!-- CodingScheme type-->
+	<xsd:simpleType name="StandardRestrictedCodingSchemeCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardCodingSchemeCodeTypeCodeList">
+			<xsd:enumeration value="305"/>
+			<xsd:enumeration value="ZSO"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CodingSchemeCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedCodingSchemeCodeTypeCodeList LocalRestrictedCodingSchemeCodeTypeCodeList"/>
+	</xsd:simpleType>
+	<!-- Document type-->
+	<xsd:simpleType name="StandardRestrictedDocumentCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardDocumentCodeTypeCodeList">
+			<xsd:enumeration value="AL3"/>
+			<xsd:enumeration value="AL4"/>
+			<xsd:enumeration value="AL5"/>
+			<xsd:enumeration value="AL6"/>
+			<xsd:enumeration value="AL7"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="DocumentCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedDocumentCodeTypeCodeList LocalRestrictedDocumentCodeTypeCodeList"/>
+	</xsd:simpleType>
+	<!-- GasDirection type-->
+	<xsd:simpleType name="StandardRestrictedGasDirectionCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardGasDirectionCodeTypeCodeList">
+			<xsd:enumeration value="Z02"/>
+			<xsd:enumeration value="Z03"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="GasDirectionCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedGasDirectionCodeTypeCodeList LocalRestrictedGasDirectionCodeTypeCodeList"/>
+	</xsd:simpleType>
+	<!-- MeasurementType type-->
+	<xsd:simpleType name="StandardRestrictedMeasurementCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardMeasurementCodeTypeCodeList">
+			<xsd:enumeration value="Z25"/>
+			<xsd:enumeration value="Z26"/>
+			<xsd:enumeration value="Z27"/>
+			<xsd:enumeration value="Z28"/>
+			<xsd:enumeration value="Z29"/>
+			<xsd:enumeration value="Z30"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="MeasurementCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedMeasurementCodeTypeCodeList LocalRestrictedMeasurementCodeTypeCodeList"/>
+	</xsd:simpleType>
+	<!-- Role type-->
+	<xsd:simpleType name="StandardRestrictedRoleCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardRoleCodeTypeCodeList">
+			<xsd:enumeration value="ZSO"/>
+			<xsd:enumeration value="ZUA"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RoleCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedRoleCodeTypeCodeList LocalRestrictedRoleCodeTypeCodeList"/>
+	</xsd:simpleType>
+	<!-- QuantityType type-->
+	<xsd:simpleType name="StandardRestrictedQuantityCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardQuantityCodeTypeCodeList">
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="QuantityCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedQuantityCodeTypeCodeList LocalRestrictedQuantityCodeTypeCodeList"/>
+	</xsd:simpleType>	
+	<!-- UnitOfMeasure type-->
+	<xsd:simpleType name="StandardRestrictedUnitOfMeasureCodeTypeCodeList">
+		<xsd:restriction base="ecl:StandardUnitOfMeasureCodeTypeCodeList">
+			<xsd:enumeration value="KW1"/>
+			<xsd:enumeration value="KW2"/>
+			<xsd:enumeration value="KWH"/>
+			<xsd:enumeration value="GWH"/>
+			<xsd:enumeration value="MTQ"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="UnitOfMeasureCodeTypeCodeList">
+		<xsd:union memberTypes="StandardRestrictedUnitOfMeasureCodeTypeCodeList LocalRestrictedUnitOfMeasureCodeTypeCodeList"/>
+	</xsd:simpleType>
+</xsd:schema>

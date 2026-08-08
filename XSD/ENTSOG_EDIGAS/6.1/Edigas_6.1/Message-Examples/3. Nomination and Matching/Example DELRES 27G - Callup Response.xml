@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<DeliveryResponse_Document xmlns="urn:easee-gas.eu:edigas:SoNominationAndMatching:DeliveryResponseDocument:6:1"  schemaVersion="1">
+	<identification>DELRES20200113A00001</identification>
+	<version>1</version>
+	<documentCode>27G</documentCode>
+	<creationDateTime>2020-01-12T19:30:47Z</creationDateTime>
+	<validityPeriod>2020-01-13T05:00Z/2020-01-14T05:00Z</validityPeriod>
+	<!-- add optional applicationContext -->
+	<issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+	<issuer_MarketParticipant.marketRole.roleCode>ZSO</issuer_MarketParticipant.marketRole.roleCode>
+	<recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+	<recipient_MarketParticipant.marketRole.roleCode>ZSO</recipient_MarketParticipant.marketRole.roleCode>
+	<deliveryOrder_Document.identification>DELORD20200113A00001</deliveryOrder_Document.identification>
+	<deliveryOrder_Document.version>1</deliveryOrder_Document.version>
+	<ConnectionPoint>
+		<identification codingScheme="305">ConnectionPntEIC</identification>  		<!-- use 305 Z-code or Y-code  or ZSO-code -->
+		<measureUnit.unitOfMeasureCode>KW1</measureUnit.unitOfMeasureCode>
+		<Internal_Account>
+			<internalAccount codingScheme="ZSO">InternalAccount</internalAccount>
+			<internalAccountTso codingScheme="305">Int.AccountTso</internalAccountTso> 			<!-- optional -->
+			<External_Account>
+				<externalAccount codingScheme="ZSO">ExternalAccount</externalAccount>
+				<externalAccountTso codingScheme="305">Ext.AccountTso</externalAccountTso> 				<!-- optional -->
+				<InformationOrigin_TimeSeries>
+					<businessCode>14G</businessCode>
+					<Period>
+						<timeInterval>2020-01-13T05:00Z/2020-01-13T06:00Z</timeInterval>
+						<direction.gasDirectionCode>Z03</direction.gasDirectionCode>
+						<total_Quantity.amount>100</total_Quantity.amount>
+						<Status>									<!-- optional -->
+							<statusCode>06G</statusCode>				<!-- optional -->
+							<complementaryText.text>Text belonging to 06G</complementaryText.text>				<!-- optional -->
+						</Status>									<!-- optional -->
+					</Period>
+					<!-- all other hours of the gasday -->
+					<Period>
+						<timeInterval>2020-01-14T04:00Z/2020-01-14T05:00Z</timeInterval>
+						<direction.gasDirectionCode>Z03</direction.gasDirectionCode>
+						<total_Quantity.amount>100</total_Quantity.amount>
+						<Status>									<!-- optional -->
+							<statusCode>06G</statusCode>				<!-- optional -->
+							<complementaryText.text>Text belonging to 06G</complementaryText.text>				<!-- optional -->
+						</Status>									<!-- optional -->
+					</Period>	
+				</InformationOrigin_TimeSeries>
+				<InformationOrigin_TimeSeries>
+					<businessCode>16G</businessCode>
+					<Period>
+						<timeInterval>2020-01-13T05:00Z/2020-01-13T06:00Z</timeInterval>
+						<direction.gasDirectionCode>Z03</direction.gasDirectionCode>
+						<total_Quantity.amount>90</total_Quantity.amount>
+						<Status>
+							<statusCode>06G</statusCode>
+							<complementaryText.text>Text belonging to 06G</complementaryText.text>
+						</Status>
+					</Period>					
+					<!-- all other hours of the gasday -->
+					<Period>
+						<timeInterval>2020-01-14T04:00Z/2020-01-14T05:00Z</timeInterval>
+						<direction.gasDirectionCode>Z03</direction.gasDirectionCode>
+						<total_Quantity.amount>90</total_Quantity.amount>
+						<Status>									<!-- optional -->
+							<statusCode>06G</statusCode>				<!-- optional -->
+							<complementaryText.text>Text belonging to 06G</complementaryText.text>				<!-- optional -->
+						</Status>									<!-- optional -->
+					</Period>
+				</InformationOrigin_TimeSeries>				
+				<InformationOrigin_TimeSeries>
+					<businessCode>12G</businessCode>
+					<Period>
+						<timeInterval>2020-01-13T05:00Z/2020-01-13T06:00Z</timeInterval>
+						<direction.gasDirectionCode>Z03</direction.gasDirectionCode>
+						<total_Quantity.amount>120</total_Quantity.amount>
+					</Period>										
+					<!-- all other hours of the gasday -->
+					<Period>
+						<timeInterval>2020-01-14T04:00Z/2020-01-14T05:00Z</timeInterval>
+						<direction.gasDirectionCode>Z03</direction.gasDirectionCode>
+						<total_Quantity.amount>120</total_Quantity.amount>
+					</Period>
+				</InformationOrigin_TimeSeries>
+			</External_Account>
+		</Internal_Account>
+	</ConnectionPoint>
+</DeliveryResponse_Document>

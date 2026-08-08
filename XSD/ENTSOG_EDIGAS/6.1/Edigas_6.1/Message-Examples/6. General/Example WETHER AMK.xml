@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<Weather_Document  xmlns="urn:easee-gas.eu:edigas:General:WeatherDocument:6:1"  schemaVersion="1">
+	<identification>WEATHER20210113A00001</identification> 
+	<version>1</version>
+	<documentCode>AMK</documentCode>  <!-- Weather forecast document -->
+	<creationDateTime>2021-07-15T09:30:47Z</creationDateTime>
+	<validityPeriod>2021-07-16T04:00Z/2021-07-17T04:00Z</validityPeriod>
+	<issuer_MarketParticipant.identification codingScheme="305">IssuerEICCode</issuer_MarketParticipant.identification>  <!-- Sent by weather data provider -->
+	<issuer_MarketParticipant.marketRole.roleCode>ZUH</issuer_MarketParticipant.marketRole.roleCode>
+	<recipient_MarketParticipant.identification codingScheme="305">RecipientEICCode</recipient_MarketParticipant.identification> <!-- Received by system operator -->
+	<recipient_MarketParticipant.marketRole.roleCode>ZUW</recipient_MarketParticipant.marketRole.roleCode>
+	<WeatherStation_ResourceObject>
+		<identification codingScheme="305">ResourceEICCode</identification> <!-- EIC or ZSO can be used for Resource Object (Weather Station)-->
+		<alternate codingScheme="ZSO">AlternateResCode</alternate>  <!-- Optional : EIC or ZSO can be used. Alternate weather station is used if the main one is not available -->
+		<Period>
+			<timeInterval>2021-07-16T04:00Z/2021-07-17T04:00Z</timeInterval>
+			<indexOfConfidence_Name.text>50</indexOfConfidence_Name.text> <!-- Index of confidence (0-100)  -->
+			<status.statusCode>03G</status.statusCode>
+			<Quantity>
+				<amount>5</amount>
+				<composition.MeteorologicalPropertyCode>ZXS</composition.MeteorologicalPropertyCode> <!-- ZXS = Cloudiness. This shall be expressed in Okta units -->
+			</Quantity>
+			<Quantity>
+				<amount>14</amount>
+				<composition.MeteorologicalPropertyCode>ZXP</composition.MeteorologicalPropertyCode> <!-- ZXP = Windspeed. This shall be expressed in meters per second (msc) -->
+			</Quantity>
+			<Quantity>
+				<amount>15</amount>
+				<composition.MeteorologicalPropertyCode>ZXR</composition.MeteorologicalPropertyCode> <!-- ZXR  = Maximum temperature. This shall be expressed in degrees celsiu -->
+			</Quantity>
+		</Period>
+		<!-- more hours in the day -->	
+			<Period>
+			<timeInterval>2021-07-17T00:00Z/2021-07-17T04:00Z</timeInterval>
+			<indexOfConfidence_Name.text>25</indexOfConfidence_Name.text> <!-- Index of confidence (0-100)  -->
+			<status.statusCode>03G</status.statusCode>
+			<Quantity>
+				<amount>13</amount>
+				<composition.MeteorologicalPropertyCode>ZXR</composition.MeteorologicalPropertyCode> 
+			</Quantity>
+		</Period>
+	</WeatherStation_ResourceObject>
+</Weather_Document>

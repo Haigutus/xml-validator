@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<MarketSituation_Document xmlns="urn:easee-gas.eu:edigas:BalancingAndSettlement:MarketSituationDocument:6:1"  schemaVersion="1">
+	<identification>MARSIT20210113A00001</identification>
+	<version>1</version>
+	<documentCode>AOG</documentCode>
+	<creationDateTime>2021-01-18T10:30:47Z</creationDateTime>
+	<validityPeriod>2021-01-17T05:00Z/2021-01-18T05:00Z</validityPeriod>
+	<!-- add optional applicationContext -->
+	<issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+	<issuer_MarketParticipant.marketRole.roleCode>ZSO</issuer_MarketParticipant.marketRole.roleCode>
+	<recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+	<recipient_MarketParticipant.marketRole.roleCode>ZSO</recipient_MarketParticipant.marketRole.roleCode>
+	<ConnectionPoint>
+		<identification codingScheme="305">ConnectionPntEIC1</identification>  <!-- use 305 Z-code or Y-code  or ZSO-code -->
+		<Account>
+			<identification codingScheme="ZSO">ACCOUNT</identification> 		<!-- use ZSO-code -->
+			<accountCode>ZOF</accountCode>   
+<!-- add optional accountTso , when used use EIC X-code-->
+			<TimeSeries>
+				<businessCode>ZXK</businessCode>
+				<measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+				<Period>
+					<timeInterval>2021-01-18T04:00Z/2021-01-18T05:00Z</timeInterval>		<!-- in this example last hour of the day is used -->
+					<status.statusCode>03G</status.statusCode>
+					<accountDirection.accountDirectionCode>ZPD</accountDirection.accountDirectionCode>
+					<accountDirection.account_Quantity.amount>1234</accountDirection.account_Quantity.amount>
+				</Period>
+			</TimeSeries>
+		</Account>
+	</ConnectionPoint>
+</MarketSituation_Document>

@@ -1,13 +1,17 @@
-FROM python:3.13-slim
+# syntax=docker/dockerfile:1
+FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install deps first (layer cache)
+COPY pyproject.toml uv.lock* ./
+RUN uv sync --frozen --no-dev || uv sync --no-dev
 
 COPY . .
 
 EXPOSE 8030
 ENV PORT=8030
+# Use the project venv created by uv
+ENV PATH="/app/.venv/bin:$PATH"
 
-CMD ["python", "app.py"]
+CMD ["uv", "run", "python", "app.py"]

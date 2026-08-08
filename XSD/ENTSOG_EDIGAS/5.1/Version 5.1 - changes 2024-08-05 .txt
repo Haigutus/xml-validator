@@ -1,0 +1,10 @@
+Version 5.1
+===========
+
+Codelist
+-UnitOfMeasureTypeList   Added KW4 (kWh/kg), A13 (Tonnes), A14 (kg)
+-QuantityCodeTypeList	 Added ZED (Gross mass), ZEE (Net mass)
+
+Balancing and Settlement (METRED)
+-Added new unitCodes to METRED document and restricted code list
+-Added new quantityCodeTypes to METRED document and restricted code list

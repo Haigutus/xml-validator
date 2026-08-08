@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<GasRequirementsDeclaration_Document xmlns="urn:easee-gas.eu:edigas:General:GasRequirementsDeclarationDocument:6:1"  schemaVersion="1">
+	<identification>GASDEC20201013A123456</identification>
+	<version>1</version>
+	<documentCode>AL1</documentCode>
+	<creationDateTime>2021-01-12T15:41:47Z</creationDateTime>
+	<validityPeriod>2021-01-13T05:00Z/2021-01-14T05:00Z</validityPeriod>
+	<issuer_MarketParticipant.identification codingScheme="305">IssuerEICCode</issuer_MarketParticipant.identification>
+	<issuer_MarketParticipant.marketRole.roleCode>UD</issuer_MarketParticipant.marketRole.roleCode>    <!-- Final Customer -->
+	<recipient_MarketParticipant.identification codingScheme="305">RecipientEICCode</recipient_MarketParticipant.identification>
+	<recipient_MarketParticipant.marketRole.roleCode>ZSO</recipient_MarketParticipant.marketRole.roleCode>
+	<contract_Reference.identification>ContractReference</contract_Reference.identification>
+	<ConnectionPoint>
+		<identification codingScheme="305">ConnectPointEIC></identification>
+		<measureUnit.unitOfMeasureCode>KW1</measureUnit.unitOfMeasureCode>
+			<Period>
+				<timeInterval>2021-01-13T05:00Z/2021-01-14T05:00Z</timeInterval>
+				<direction.gasDirectionCode>Z02</direction.gasDirectionCode>
+				<quantity.amount>25000</quantity.amount>
+				<Reason>
+					<reasonCode>22G</reasonCode>
+					<!--Planned maintenance -->
+					<text>Comment</text>
+				</Reason>
+			</Period>
+	</ConnectionPoint>
+</GasRequirementsDeclaration_Document>

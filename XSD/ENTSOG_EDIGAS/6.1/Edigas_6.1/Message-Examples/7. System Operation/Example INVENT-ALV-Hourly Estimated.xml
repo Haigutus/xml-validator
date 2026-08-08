@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<!-- EXAMPLE 1 :  Inventory Level Estimated for the end of current gas day for a BRP account and for a Storage Point -->
+<!-- Example with Hourly values Inventory Level for past hours are due to confirmed past nominations, Inventory level for remaining hours are due to current confirmed nominations for futures hours -->
+<InventoryPosition_Document xmlns="urn:easee-gas.eu:edigas:SystemOperation:InventoryPositionDocument:6:1"  schemaVersion="1" >
+  <identification>identification1</identification>
+  <version>1</version>
+  <documentCode>ALV</documentCode>
+  <creationDateTime>2021-10-13T12:30:51Z</creationDateTime> <!-- current gas day --> 
+  <validityPeriod>2021-10-13T04:00Z/2021-10-14T04:00Z</validityPeriod>  <!-- REMARK : here it is the gas day -->
+  <issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+  <issuer_MarketParticipant.marketRole.roleCode>ZUS</issuer_MarketParticipant.marketRole.roleCode>
+  <recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+  <recipient_MarketParticipant.marketRole.roleCode>ZSH</recipient_MarketParticipant.marketRole.roleCode>
+  <ConnectionPoint>
+    <identification codingScheme="305">StoragePoint-EIC</identification> <!-- identification of Storage point or product --> 
+    <Account>
+      <internalAccount codingScheme="ZSO">BRP-account</internalAccount>  <!-- In this Example : The BRP-internal account, could also be a product/contract idendification  --> 
+      <TimeSeries>
+        <businessCode>ZXK</businessCode>
+        <measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+        <Period>
+          <timeStamp>2021-10-13T04:00:00Z</timeStamp>
+          <quantity.amount>240000</quantity.amount> <!-- BRP was holding 240 000 kWh in storagePoint-EIC at 2021-10-13T04:00:00Z (at the end of the previous gas day) --> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode> <!-- Estimated -->
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T05:00:00Z</timeStamp>
+          <quantity.amount>240100</quantity.amount>  <!-- past  --> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T06:00:00Z</timeStamp>
+          <quantity.amount>240200</quantity.amount> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T07:00:00Z</timeStamp>
+          <quantity.amount>240300</quantity.amount> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T08:00:00Z</timeStamp>
+          <quantity.amount>240400</quantity.amount> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T09:00:00Z</timeStamp>
+          <quantity.amount>240400</quantity.amount>
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T10:00:00Z</timeStamp>
+          <quantity.amount>240400</quantity.amount> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T11:00:00Z</timeStamp>
+          <quantity.amount>240400</quantity.amount> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T12:00:00Z</timeStamp>
+          <quantity.amount>240400</quantity.amount> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T13:00:00Z</timeStamp>
+          <quantity.amount>240000</quantity.amount>
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T14:00:00Z</timeStamp>
+          <quantity.amount>240000</quantity.amount>
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T15:00:00Z</timeStamp>
+          <quantity.amount>240000</quantity.amount>   
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T16:00:00Z</timeStamp>
+          <quantity.amount>240100</quantity.amount> <!-- future hours  -->
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T17:00:00Z</timeStamp>
+          <quantity.amount>240200</quantity.amount> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T18:00:00Z</timeStamp>
+          <quantity.amount>240300</quantity.amount> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T19:00:00Z</timeStamp>
+          <quantity.amount>240400</quantity.amount> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T20:00:00Z</timeStamp>
+          <quantity.amount>240500</quantity.amount>
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T21:00:00Z</timeStamp>
+          <quantity.amount>240600</quantity.amount> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T22:00:00Z</timeStamp>
+          <quantity.amount>240700</quantity.amount>
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T23:00:00Z</timeStamp>
+          <quantity.amount>240000</quantity.amount> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-13T00:00:00Z</timeStamp>
+          <quantity.amount>240000</quantity.amount> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-14T01:00:00Z</timeStamp>
+          <quantity.amount>240000</quantity.amount>
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-14T02:00:00Z</timeStamp>
+          <quantity.amount>240000</quantity.amount>
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-14T03:00:00Z</timeStamp>
+          <quantity.amount>240000</quantity.amount> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+        <Period>
+          <timeStamp>2021-10-14T04:00:00Z</timeStamp>
+          <quantity.amount>240000</quantity.amount> <!-- BRP will holding 240 000 kWh in storagePoint-EIC at 2021-10-13T04:00:00Z (at the end of the current gas day) --> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>
+           <status.statusCode>03G</status.statusCode>
+        </Period>
+      </TimeSeries>
+    </Account>
+  </ConnectionPoint>
+</InventoryPosition_Document>

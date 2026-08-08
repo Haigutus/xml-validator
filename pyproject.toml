@@ -1,0 +1,11 @@
+[project]
+name = "xml-validator"
+version = "1.0.0"
+description = "UI to validate European energy market XML (ENTSO-E ESMP / Edig@s)"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dash>=3.0,<5",
+    "lxml>=5.0",
+]
+

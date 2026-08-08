@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided only for better understanding of the example(-s) provided. None of examples or comments can be used as the reference to the standard. ALWAYS follow the documentation of latest edig@s version available on www.edigas.org or any other official sources -->
+<GasFlowRequirements_Document xmlns="urn:easee-gas.eu:edigas:SystemOperation:GasFlowRequirementsDocument:6:1"  schemaVersion="1">
+    <identification>20200708A761999</identification>
+    <version>1</version>
+    <documentCode>ARG</documentCode>
+    <creationDateTime>2020-07-08T19:30:47Z</creationDateTime>
+    <issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+    <issuer_MarketParticipant.marketRole.roleCode>ZUW</issuer_MarketParticipant.marketRole.roleCode>
+    <recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+    <recipient_MarketParticipant.marketRole.roleCode>ZSH</recipient_MarketParticipant.marketRole.roleCode>
+    <validityPeriod>2020-07-09T04:00Z/2021-07-10T04:00Z</validityPeriod>
+    <ConnectionPoint>
+        <identification codingScheme="305">ConnectionPntEIC</identification>
+        <measureUnit.unitOfMeasureCode>KW1</measureUnit.unitOfMeasureCode>
+        <account.identification codingScheme="ZSO">AccountID</account.identification>
+        <Period>
+            <timeInterval>2020-07-09T04:00Z/2021-07-10T04:00Z</timeInterval>
+            <Quantity>
+                <direction.gasDirectionCode>Z02</direction.gasDirectionCode>
+                <amount>10000</amount>
+            </Quantity>
+        </Period>
+    </ConnectionPoint>
+</GasFlowRequirements_Document>

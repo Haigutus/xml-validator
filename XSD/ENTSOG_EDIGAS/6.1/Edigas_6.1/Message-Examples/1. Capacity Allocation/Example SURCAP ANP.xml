@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided only for better understanding of the example(-s) provided. None of examples or comments can be used as the reference to the standard. ALWAYS follow the documentation of latest edig@s version available on www.edigas.org or any other official sources -->
+<SurrenderCapacity_Document xmlns="urn:easee-gas.eu:edigas:CapacityAllocationInitialisation:SurrenderCapacityDocument:6:1" schemaVersion="1">
+	<!-- must be an unique identification per message type, assigned by the sender of the message-->
+	<identification>001</identification>
+	<version>1</version>
+	<documentCode>ANP</documentCode>
+	<creationDateTime>2021-03-10T18:17:14Z</creationDateTime>
+	<validityPeriod>2021-03-11T05:00Z/2021-03-12T05:00Z</validityPeriod>
+	<issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+	<issuer_MarketParticipant.marketRole.roleCode>ZUV</issuer_MarketParticipant.marketRole.roleCode>
+	<recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+	<recipient_MarketParticipant.marketRole.roleCode>ZUJ</recipient_MarketParticipant.marketRole.roleCode>
+	<auction_Reference.identification>AUC-700442</auction_Reference.identification>
+	<user_Reference.identification>personal_id</user_Reference.identification>
+	<connectionPoint.identification codingScheme="305">ConnectionPntEIC</connectionPoint.identification>
+	<connectionPoint.measureUnit.unitOfMeasureCode>KW1</connectionPoint.measureUnit.unitOfMeasureCode>
+	<connectionPoint.toTso_MarketParticipant.identification codingScheme="305">toSoCodeEIC</connectionPoint.toTso_MarketParticipant.identification>
+	<connectionPoint.toTso_MarketParticipant.crp_MarketParticipant.identification codingScheme="305">toSoCRPCodeEIC</connectionPoint.toTso_MarketParticipant.crp_MarketParticipant.identification>
+	<connectionPoint.toTso_MarketParticipant.crp_MarketParticipant.account.identification codingScheme="ZSO">toSoBRPCodeZSO</connectionPoint.toTso_MarketParticipant.crp_MarketParticipant.account.identification>
+	<connectionPoint.fromTso_MarketParticipant.identification codingScheme="305">fromSoCodeEIC</connectionPoint.fromTso_MarketParticipant.identification>
+	<connectionPoint.fromTso_MarketParticipant.crp_MarketParticipant.identification codingScheme="305">fromSoCRPCodeEIC</connectionPoint.fromTso_MarketParticipant.crp_MarketParticipant.identification>
+	<connectionPoint.fromTso_MarketParticipant.crp_MarketParticipant.account.identification codingScheme="ZSO">fromSoBRPCodeZSO</connectionPoint.fromTso_MarketParticipant.crp_MarketParticipant.account.identification>
+	<connectionPoint.period.timeInterval>2021-03-11T05:00Z/2021-03-12T05:00Z</connectionPoint.period.timeInterval>
+	<connectionPoint.period.surrendered_Quantity.amount>1000</connectionPoint.period.surrendered_Quantity.amount>
+</SurrenderCapacity_Document>

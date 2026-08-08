@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided only for better understanding of the example(-s) provided. None of examples or comments can be used as the reference to the standard. ALWAYS follow the documentation of latest edig@s version available on www.edigas.org or any other official sources -->
+<NominationResponse_Document xmlns="urn:easee-gas.eu:edigas:BrpNominationAndMatching:NominationResponseDocument:6:1"  schemaVersion="1">
+	<identification>20200201C761999</identification>
+	<version>1</version>
+	<documentCode>AND</documentCode>
+	<creationDateTime>2021-02-01T13:30:47Z</creationDateTime>
+	<validityPeriod>2021-02-02T05:00Z/2021-02-03T05:00Z</validityPeriod>
+	<issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+	<issuer_MarketParticipant.marketRole.roleCode>ZSO</issuer_MarketParticipant.marketRole.roleCode>
+	<recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+	<recipient_MarketParticipant.marketRole.roleCode>ZSH</recipient_MarketParticipant.marketRole.roleCode>
+	<nomination_Document.identification>20200201D761999</nomination_Document.identification>
+	<nomination_Document.version>1</nomination_Document.version>
+	<nomination_Document.documentCode>01G</nomination_Document.documentCode>
+	<Internal_Account>
+		<internalAccount codingScheme="ZSO">InternalAccount</internalAccount>
+		<ConnectionPoint>
+			<identification codingScheme="305">ConnectionPntEIC</identification>
+			<measureUnit.unitOfMeasureCode>KW1</measureUnit.unitOfMeasureCode>
+			<NominationType>
+				<nominationCode>A02</nominationCode>
+				<External_Account>
+					<externalAccount codingScheme="ZSO">ExternalAccount</externalAccount>
+					<InformationOrigin_TimeSeries>
+						<businessCode>14G</businessCode>
+						<Period>
+							<timeInterval>2021-02-02T05:00Z/2021-02-03T05:00Z</timeInterval>
+							<direction.gasDirectionCode>Z02</direction.gasDirectionCode>
+							<quantity.amount>0</quantity.amount>
+							<Status>
+								<statusCode>07G</statusCode>
+							</Status>
+						</Period>
+					</InformationOrigin_TimeSeries>
+				</External_Account>
+			</NominationType>
+		</ConnectionPoint>
+	</Internal_Account>
+</NominationResponse_Document>

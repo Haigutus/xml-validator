@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided only for better understanding of the example(-s) provided. None of examples or comments can be used as the reference to the standard. ALWAYS follow the documentation of latest edig@s version available on www.edigas.org or any other official sources -->
+<TransferAdvice_Document xmlns="urn:easee-gas.eu:edigas:CapacityAllocationSecondaryMarket:TransferAdviceDocument:6:1" schemaVersion="1">
+	<!-- must be an unique identification per message type, assigned by the sender of the message-->
+	<identification>001</identification>
+	<version>1</version>
+	<documentCode>AMN</documentCode>
+	<creationDateTime>2021-03-10T22:27:11Z</creationDateTime>
+	<validityPeriod>2021-03-11T05:00Z/2021-03-12T05:00Z</validityPeriod>
+	<issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+	<issuer_MarketParticipant.marketRole.roleCode>ZUV</issuer_MarketParticipant.marketRole.roleCode>
+	<recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+	<recipient_MarketParticipant.marketRole.roleCode>ZSO</recipient_MarketParticipant.marketRole.roleCode>
+	<dealOriginator_MarketParticipant.identification codingScheme="305">OriginCodeEIC</dealOriginator_MarketParticipant.identification>
+	<dealId_Reference.identification>Deal-01478</dealId_Reference.identification>
+	<connectionPoint.identification codingScheme="305">ConnectionPntEIC</connectionPoint.identification>
+	<quantity_MeasureUnit.unitOfMeasureCode>KW1</quantity_MeasureUnit.unitOfMeasureCode>
+	<trading_Procedure.procedureCode>A02</trading_Procedure.procedureCode>
+	<type_Transaction.transactionCode>A01</type_Transaction.transactionCode>
+	<Account>
+		<identification codingScheme="ZSO">IssuerAccount</identification>
+		<Period>
+			<timeInterval>2021-03-11T05:00Z/2021-03-12T05:00Z</timeInterval>
+			<direction.gasDirectionCode>Z02</direction.gasDirectionCode>
+			<quantity.amount>200</quantity.amount>
+			<bundled_Indication.indicatorCode>01G</bundled_Indication.indicatorCode>
+			<availability.availabilityCode>Z06</availability.availabilityCode>
+		</Period>
+	</Account>
+</TransferAdvice_Document>

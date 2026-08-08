@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
-# Update all auto-refreshable XSD packages (ENTSO-E CIM + Edig@s 5.1/6.1).
-# Never deletes existing XSD trees — new versions land in versioned folders.
+# Replace ENTSO-E ESMP and/or Edig@s packages under fixed folder names.
 #
-# Usage:
-#   ./scripts/update_xsds.sh
+#   ./scripts/update_xsds.sh           # both
 #   ./scripts/update_xsds.sh entsoe
 #   ./scripts/update_xsds.sh edigas
 #   ./scripts/update_xsds.sh edigas 5.1
@@ -33,5 +31,5 @@ case "$target" in
 esac
 
 echo ""
-echo "==> Current XSD top-level trees:"
+echo "==> XSD top-level trees:"
 ls -1 XSD/ | sed 's/^/    /'

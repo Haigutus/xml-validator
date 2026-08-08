@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<!-- EXAMPLE 2 :  Inventory Level Allocated after the end of gas day for a BRP account and for a Storage Point -->
+<InventoryPosition_Document xmlns="urn:easee-gas.eu:edigas:SystemOperation:InventoryPositionDocument:6:1"  schemaVersion="1" >
+  <identification>identification1</identification>
+  <version>1</version>
+  <documentCode>ALV</documentCode>
+  <creationDateTime>2021-10-14T12:30:51Z</creationDateTime>
+  <validityPeriod>2021-10-13T04:00Z/2021-10-14T04:00Z</validityPeriod>  <!-- REMARK : here it is the gas day -->
+  <issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+  <issuer_MarketParticipant.marketRole.roleCode>ZUS</issuer_MarketParticipant.marketRole.roleCode>
+  <recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+  <recipient_MarketParticipant.marketRole.roleCode>ZSH</recipient_MarketParticipant.marketRole.roleCode>
+  <ConnectionPoint>
+    <identification codingScheme="305">StoragePoint-EIC</identification> <!-- identification of Storage point or product --> 
+    <Account>
+      <internalAccount codingScheme="ZSO">BRP-account</internalAccount>  <!-- In this Example : The BRP-internal account, could also be a product/contract idendification  --> 
+      <TimeSeries>
+        <businessCode>ZXK</businessCode>
+        <measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+        <Period>
+          <timeStamp>2021-10-14T04:00:00Z</timeStamp>
+          <quantity.amount>250000</quantity.amount>  
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>          
+          <status.statusCode>04G</status.statusCode> <!-- BRP holds 250 000 kWh in storagePoint-EIC at 2021-10-14T04:00:00Z (at the end of the gas day) / Provisional allocation. Will be definitive with 05G-->          
+        </Period>
+      </TimeSeries>
+      <TimeSeries>
+        <businessCode>Z47</businessCode>
+        <measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+        <Period>
+          <timeStamp>2021-10-14T04:00:00Z</timeStamp>
+          <quantity.amount>10</quantity.amount>  
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>          
+          <status.statusCode>04G</status.statusCode> <!-- BRP overrun by 10 kWh his storage level limits, this quantity can be included in a tolerance or invoiced as a purchase depending on contractual conditions -->
+        </Period>
+      </TimeSeries>
+    </Account>
+  </ConnectionPoint>
+</InventoryPosition_Document>

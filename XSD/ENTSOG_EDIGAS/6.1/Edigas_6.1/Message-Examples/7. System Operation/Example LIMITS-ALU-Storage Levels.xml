@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<!-- EXAMPLE 1: This document is an example with one gas day storage inventory level limits. In this example the lower limit is allowed to be less than 0 as a debit value. -->
+<Limits_Document xmlns="urn:easee-gas.eu:edigas:SystemOperation:LimitsDocument:6:1"  schemaVersion="2"  >
+  <identification>identification1</identification>
+  <version>1</version>
+  <documentCode>ALU</documentCode>
+  <creationDateTime>2020-10-12T12:30:51Z</creationDateTime>
+  <validityPeriod>2020-10-13T04:00Z/2020-10-14T04:00Z</validityPeriod>
+  <issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+  <issuer_MarketParticipant.marketRole.roleCode>ZUS</issuer_MarketParticipant.marketRole.roleCode> 
+  <recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+  <recipient_MarketParticipant.marketRole.roleCode>ZSH</recipient_MarketParticipant.marketRole.roleCode>
+  <contract_Reference.identification>contract_Reference.identification1</contract_Reference.identification>  
+  <measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>  <!-- Storage inventory limits in KWh --> 
+  <ConnectionPoint>
+    <identification codingScheme="305">StoragePoint-EIC</identification> <!-- identification of Storage point or product --> 
+      <TimeSeries>
+        <businessCode>Z44</businessCode> <!-- Upper Limit -->
+        <Availability>
+          <availabilityCode>Z06</availabilityCode> <!-- Firm limits --> 
+          <Period>
+            <timeInterval>2020-10-13T04:00Z/2020-10-14T04:00Z</timeInterval>          
+             <Quantity>
+              <amount>350000</amount>
+              <quantityCode>ZYA</quantityCode> <!-- Storage inventory level --> 
+              <accountDirection.accountDirectionCode>ZPE</accountDirection.accountDirectionCode>	<!-- credit position -->
+              <status.statusCode>05G</status.statusCode>	<!-- definitive -->
+            </Quantity>
+          </Period> 
+          </Availability>
+      </TimeSeries>
+      <TimeSeries>
+        <businessCode>Z45</businessCode> <!-- Lower Limit -->
+        <Availability>
+          <availabilityCode>Z06</availabilityCode> <!-- Firm limits --> 
+          <Period>
+            <timeInterval>2020-10-13T04:00Z/2020-10-14T04:00Z</timeInterval> 
+             <Quantity>
+              <amount>20000</amount>
+              <quantityCode>ZYA</quantityCode> <!-- Storage inventory level --> 
+              <accountDirection.accountDirectionCode>ZPD</accountDirection.accountDirectionCode>	<!-- debit position allowed (as tolerance for example) -->
+              <status.statusCode>05G</status.statusCode> <!-- definitive -->
+            </Quantity>
+          </Period> 
+        </Availability>
+      </TimeSeries>
+  </ConnectionPoint>
+</Limits_Document>

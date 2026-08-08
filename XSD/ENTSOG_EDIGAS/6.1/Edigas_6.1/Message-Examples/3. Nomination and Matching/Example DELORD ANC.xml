@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided only for better understanding of the example(-s) provided. None of examples or comments can be used as the reference to the standard. ALWAYS follow the documentation of latest edig@s version available on www.edigas.org or any other official sources -->
+<DeliveryOrder_Document xmlns="urn:easee-gas.eu:edigas:SoNominationAndMatching:DeliveryOrderDocument:6:1"  schemaVersion="1">
+	<identification>DELORD20210101A761999</identification> 
+	<version>1</version>
+	<documentCode>ANC</documentCode>
+	<creationDateTime>2020-12-31T15:00:00Z</creationDateTime>
+	<validityPeriod>2021-01-01T05:00Z/2021-01-02T05:00Z</validityPeriod>
+	<issuer_MarketParticipant.identification codingScheme="305">IssuerCodeEIC</issuer_MarketParticipant.identification>
+	<issuer_MarketParticipant.marketRole.roleCode>ZSO</issuer_MarketParticipant.marketRole.roleCode>
+	<recipient_MarketParticipant.identification codingScheme="305">RecipientCodeEIC</recipient_MarketParticipant.identification>
+	<recipient_MarketParticipant.marketRole.roleCode>ZSO</recipient_MarketParticipant.marketRole.roleCode>
+	<singleSidedSource_Document.identification>NOMINT20210101A123456</singleSidedSource_Document.identification>
+	<singleSidedSource_Document.version>1</singleSidedSource_Document.version>
+	<singleSidedSource_Document.documentCode>01G</singleSidedSource_Document.documentCode>
+	<singleSidedSource_Document.brpOriginator_MarketParticipant.identification codingScheme="305">MarkedPartEIC</singleSidedSource_Document.brpOriginator_MarketParticipant.identification>
+	<ConnectionPoint>
+		<identification codingScheme="305">ConnectionPntEIC</identification>
+		<measureUnit.unitOfMeasureCode>KW1</measureUnit.unitOfMeasureCode>
+		<Internal_Account>	
+			<internalAccount codingScheme="ZSO">InternalAccount</internalAccount>
+			<External_Account>
+				<externalAccount codingScheme="ZSO">ExternalAccountA</externalAccount>
+				<InformationOrigin_TimeSeries>
+					<businessCode>12G</businessCode>
+					<timeStamp_DateTime.dateTime>2020-12-31T14:15:00Z</timeStamp_DateTime.dateTime>
+					<Period>
+						<timeInterval>2021-01-01T05:00Z/2021-01-02T05:00Z</timeInterval>
+						<direction.gasDirectionCode>Z03</direction.gasDirectionCode>
+						<total_Quantity.amount>100000</total_Quantity.amount>
+					</Period>
+				</InformationOrigin_TimeSeries>
+			</External_Account>
+			<External_Account>
+				<externalAccount codingScheme="ZSO">ExternalAccountB</externalAccount>
+				<InformationOrigin_TimeSeries>
+					<businessCode>12G</businessCode>
+					<timeStamp_DateTime.dateTime>2020-12-31T14:15:00Z</timeStamp_DateTime.dateTime>
+					<Period>
+						<timeInterval>2021-01-01T05:00Z/2021-01-02T05:00Z</timeInterval>
+						<direction.gasDirectionCode>Z03</direction.gasDirectionCode>
+						<total_Quantity.amount>200000</total_Quantity.amount>
+					</Period>
+				</InformationOrigin_TimeSeries>
+			</External_Account>
+		</Internal_Account>
+	</ConnectionPoint>
+</DeliveryOrder_Document>

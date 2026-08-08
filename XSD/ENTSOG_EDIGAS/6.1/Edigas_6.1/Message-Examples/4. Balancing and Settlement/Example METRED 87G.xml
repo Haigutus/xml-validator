@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<MeterReading_Document xmlns="urn:easee-gas.eu:edigas:BalancingAndSettlement:MeterReadingDocument:6:1"  schemaVersion="1">
+    <identification>20201013A111122</identification>
+    <version>1</version>
+    <documentCode>87G</documentCode>
+    <creationDateTime>2020-12-07T18:13:51Z</creationDateTime>
+    <validityPeriod>2020-12-01T05:00Z/2020-12-02T05:00Z</validityPeriod>
+    <issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+    <issuer_MarketParticipant.marketRole.roleCode>ZSO</issuer_MarketParticipant.marketRole.roleCode>
+    <recipient_MarketParticipant.identification codingScheme="305">RecipentEIC</recipient_MarketParticipant.identification>
+    <recipient_MarketParticipant.marketRole.roleCode>ZSH</recipient_MarketParticipant.marketRole.roleCode>
+    <ConnectionPoint>
+        <identification codingScheme="305">ConnectionPnt</identification>
+        <Meter>
+            <identification codingScheme="305">ConnectionPnt</identification>
+            <MeasureType_Composition>
+                <physicalPropertyCode>ZWQ</physicalPropertyCode> <!-- Use either physicalPropertyCode or chemicalCompoundCode-->
+                <measureUnit.unitOfMeasureCode>KW1</measureUnit.unitOfMeasureCode>
+                <Period>
+                    <timeInterval>2020-12-01T05:00Z/2020-12-02T05:00Z</timeInterval>
+                    <quantity.amount>100</quantity.amount>
+                    <direction.gasDirectionCode>Z02</direction.gasDirectionCode> <!-- Optional-->
+                    <status.statusCode>03G</status.statusCode>
+                </Period>
+            </MeasureType_Composition>
+        </Meter>
+   </ConnectionPoint>        
+</MeterReading_Document>

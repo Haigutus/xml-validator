@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<!-- EXAMPLE 1 :  Inventory Level Estimated for the CURRENT TIME of the current gas day for a BRP account and for a Storage Point -->
+<InventoryPosition_Document xmlns="urn:easee-gas.eu:edigas:SystemOperation:InventoryPositionDocument:6:1"  schemaVersion="1" >
+  <identification>identification1</identification>
+  <version>1</version>
+  <documentCode>ALV</documentCode>
+  <creationDateTime>2021-10-13T13:30:51Z</creationDateTime>
+  <validityPeriod>2021-10-13T04:00Z/2021-10-14T04:00Z</validityPeriod>  <!-- Message validity period for the whole gas day, even though inventory level reported at 13:00 -->
+  <issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+  <issuer_MarketParticipant.marketRole.roleCode>ZUS</issuer_MarketParticipant.marketRole.roleCode>
+  <recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+  <recipient_MarketParticipant.marketRole.roleCode>ZSH</recipient_MarketParticipant.marketRole.roleCode>
+  <ConnectionPoint>
+    <identification codingScheme="305">StoragePoint-EIC</identification> <!-- identification of Storage point or product --> 
+    <Account>
+      <internalAccount codingScheme="ZSO">BRP-account</internalAccount>  <!-- In this Example : The BRP-internal account, could also be a product/contract idendification  --> 
+      <TimeSeries>
+        <businessCode>ZXK</businessCode>
+        <measureUnit.unitOfMeasureCode>KWH</measureUnit.unitOfMeasureCode>
+        <Period>
+          <timeStamp>2021-10-13T13:00:00Z</timeStamp>
+          <quantity.amount>100000</quantity.amount> <!-- with the past hours nomination and current conditions, BRP holds 100 000 kWh in storagePoint-EIC at 2021-10-13T13:00:00Z (9h have passed in the gas day) --> 
+          <quantity.accountDirection.accountDirectionCode>ZPE</quantity.accountDirection.accountDirectionCode>          
+          <status.statusCode>03G</status.statusCode> <!-- Estimated --> 
+        </Period>
+      </TimeSeries>
+    </Account>
+  </ConnectionPoint>
+</InventoryPosition_Document>

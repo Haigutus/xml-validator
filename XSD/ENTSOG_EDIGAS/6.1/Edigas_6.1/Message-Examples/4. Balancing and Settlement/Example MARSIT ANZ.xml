@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<MarketSituation_Document xmlns="urn:easee-gas.eu:edigas:BalancingAndSettlement:MarketSituationDocument:6:1"  schemaVersion="1">
+	<identification>MARSIT2020113A00001</identification>
+	<version>1</version>
+	<documentCode>ANZ</documentCode>
+	<creationDateTime>2020-01-12T19:30:47Z</creationDateTime>
+	<validityPeriod>2020-01-13T05:00Z/2020-01-14T05:00Z</validityPeriod>
+<!-- add optional applicationContext -->	
+	<issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+	<issuer_MarketParticipant.marketRole.roleCode>ZUK</issuer_MarketParticipant.marketRole.roleCode>
+	<recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+	<recipient_MarketParticipant.marketRole.roleCode>ZSH</recipient_MarketParticipant.marketRole.roleCode>
+	<MarketArea>
+		<identification codingScheme="305">MarketAreaEIC</identification>      <!-- use Y code -->
+		<Account>
+			<identification codingScheme="ZSO">ACCOUNT</identification>        <!-- use 305 or ZSO code -->
+			<accountCode>ZOE</accountCode>
+<!-- add optional accountTso -->	
+			<TimeSeries>
+				<businessCode>Z01</businessCode>
+				<measureUnit.unitOfMeasureCode>KW1</measureUnit.unitOfMeasureCode>
+				<currency.currencyCode>EUR</currency.currencyCode>
+				<Transaction>
+					<identification>TR1111</identification>					
+					<Period>
+						<timeInterval>2020-01-13T12:00Z/2020-01-14T05:00Z</timeInterval>
+						<status.statusCode>05G</status.statusCode>
+						<accountDirection.accountDirectionCode>ZPD</accountDirection.accountDirectionCode>
+						<accountDirection.account_Quantity.amount>12345</accountDirection.account_Quantity.amount>
+						<price.amount>0.123456</price.amount>
+					</Period>
+				</Transaction>
+				<Transaction>
+					<identification>TR2222</identification>					
+					<Period>
+						<timeInterval>2020-01-13T16:00Z/2020-01-13T17:00Z</timeInterval>
+						<status.statusCode>05G</status.statusCode>
+						<accountDirection.accountDirectionCode>ZPD</accountDirection.accountDirectionCode>
+						<accountDirection.account_Quantity.amount>23456</accountDirection.account_Quantity.amount>
+						<price.amount>0.234567</price.amount>
+					</Period>
+				</Transaction>
+				<Transaction>
+					<identification>TR3333</identification>					
+					<Period>
+						<timeInterval>2020-01-13T20:00Z/2020-01-14T05:00Z</timeInterval>
+						<status.statusCode>05G</status.statusCode>
+						<accountDirection.accountDirectionCode>ZPE</accountDirection.accountDirectionCode>
+						<accountDirection.account_Quantity.amount>34567</accountDirection.account_Quantity.amount>
+						<price.amount>0.345678</price.amount>
+					</Period>
+				</Transaction>
+			</TimeSeries>
+		</Account>
+	</MarketArea>
+</MarketSituation_Document>

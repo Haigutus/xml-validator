@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IMPORTANT! All comments in this document are provided for better undertanding of the example(-s) provided. None of the examples or comments can be used as the reference to the standard. ALWAYS refer to the documentation of latest edig@s version avalaible in www.edigas.org or any other official source -->
+<Offers_Document xmlns="urn:easee-gas.eu:edigas:GasTradingOtc:OffersDocument:6:1" schemaVersion="1">
+    <identification>20201013A111122</identification>
+    <version>1</version>
+    <documentCode>AMA</documentCode><!-- AMA = Purchase requirements Document -->
+    <creationDateTime>2020-10-12T12:30:51Z</creationDateTime>
+    <validityPeriod>2020-10-13T04:00Z/2020-10-14T04:00Z</validityPeriod>
+    <issuer_MarketParticipant.identification codingScheme="305">IssuerEIC</issuer_MarketParticipant.identification>
+    <issuer_MarketParticipant.marketRole.roleCode>ZSH</issuer_MarketParticipant.marketRole.roleCode>
+    <recipient_MarketParticipant.identification codingScheme="305">RecipientEIC</recipient_MarketParticipant.identification>
+    <recipient_MarketParticipant.marketRole.roleCode>ZSH</recipient_MarketParticipant.marketRole.roleCode>
+    <contract_Reference.identification>Example-ContractReference</contract_Reference.identification>
+    <ConnectionPoint>
+        <identification codingScheme="305">Connection-EIC</identification>
+        <measureUnit.unitOfMeasureCode>KW1</measureUnit.unitOfMeasureCode>
+        <MaximumQuantityAvailable_Period>
+            <timeInterval>2020-10-13T04:00Z/2020-10-14T04:00Z</timeInterval>
+            <direction.gasDirectionCode>Z03</direction.gasDirectionCode>
+            <quantity.amount>10000</quantity.amount>
+            <deviation_Reason.reasonCode>25G</deviation_Reason.reasonCode><!-- optional, 25G = Planned availability. -->
+        </MaximumQuantityAvailable_Period>
+        <MinimumQuantityAvailable_Period><!-- optional -->
+            <timeInterval>2020-10-13T04:00Z/2020-10-14T04:00Z</timeInterval>
+            <direction.gasDirectionCode>Z02</direction.gasDirectionCode>
+            <quantity.amount>80000</quantity.amount>
+            <deviation_Reason.reasonCode>25G</deviation_Reason.reasonCode>
+        </MinimumQuantityAvailable_Period>
+    </ConnectionPoint>
+    <ContractualPossibility_Period><!-- optional -->
+        <timeInterval>2020-10-13T04:00Z/2020-10-14T04:00Z</timeInterval>
+        <contractual_Quantity.quantityCode>ZXH</contractual_Quantity.quantityCode><!-- ZXH = Maximum possible -->
+        <contractual_Quantity.amount>10000</contractual_Quantity.amount>
+        <measureUnit.unitOfMeasureCode>KW1</measureUnit.unitOfMeasureCode>
+        <direction.gasDirectionCode>Z03</direction.gasDirectionCode>
+    </ContractualPossibility_Period>    
+ </Offers_Document>

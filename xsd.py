@@ -26,9 +26,17 @@ XSD_INDEX = _index_xsds()
 
 
 def _pick_xsd(paths):
-    """Prefer CIM_* package paths; else first sorted path."""
-    cim = [p for p in paths if "CIM_" in p.parts]
-    return sorted(cim or paths)[0]
+    """Prefer current registry trees over legacy; else first sorted path."""
+    for prefer in ("ENTSOE_ESMP", "ENTSOG_EDIGAS"):
+        hit = [p for p in paths if prefer in p.parts]
+        if hit:
+            return sorted(hit)[0]
+    # Legacy names still in some checkouts
+    for prefer in ("CIM_", "EAP-Schemas"):
+        hit = [p for p in paths if any(prefer in part for part in p.parts)]
+        if hit:
+            return sorted(hit)[0]
+    return sorted(paths)[0]
 
 
 def _root_namespace(doc):
