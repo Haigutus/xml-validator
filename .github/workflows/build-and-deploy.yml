@@ -9,8 +9,6 @@
 #   GCP_REGION
 #   AR_REPO
 #   SERVICE_NAME
-# Optional:
-#   CUSTOM_DOMAIN   (printed after deploy only; mapping is not auto-created in CI)
 name: Build and deploy
 
 on:
@@ -153,8 +151,4 @@ jobs:
             --liveness-probe=httpGet.path=/healthz,httpGet.port=8080,timeoutSeconds=3,periodSeconds=30,failureThreshold=3
 
       - name: Deployment URL
-        run: |
-          echo "Live: ${{ steps.deploy.outputs.url }}"
-          if [[ -n "${{ vars.CUSTOM_DOMAIN }}" ]]; then
-            echo "Custom domain (configure DNS / domain mapping separately): https://${{ vars.CUSTOM_DOMAIN }}"
-          fi
+        run: echo "Live: ${{ steps.deploy.outputs.url }}"

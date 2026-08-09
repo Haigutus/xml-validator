@@ -82,7 +82,6 @@ Repo → **Settings → Secrets and variables → Actions → Variables**:
 | `AR_REPO` | Artifact Registry repository id |
 | `GCP_SERVICE_ACCOUNT` | `github-deploy@PROJECT_ID.iam.gserviceaccount.com` |
 | `GCP_WORKLOAD_IDENTITY_PROVIDER` | `projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/…/providers/…` |
-| `CUSTOM_DOMAIN` | optional; only printed after deploy |
 
 ```bash
 # with gh authenticated:
@@ -92,8 +91,6 @@ gh variable set SERVICE_NAME --body "xml-validator"
 gh variable set AR_REPO --body "xml-validator"
 gh variable set GCP_SERVICE_ACCOUNT --body "github-deploy@YOUR_PROJECT.iam.gserviceaccount.com"
 gh variable set GCP_WORKLOAD_IDENTITY_PROVIDER --body "projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/github/providers/github"
-# optional:
-# gh variable set CUSTOM_DOMAIN --body "validator.example.com"
 ```
 
 Then protect `main` and push. CI fails fast if required variables are missing.
@@ -121,7 +118,7 @@ make deploy
 | gunicorn | 1 worker, 4 threads; listens ASAP |
 | Request-based CPU | Default throttling (no always-on CPU bill) |
 
-Custom domain: Cloud Run domain mapping + DNS at your registrar (set `DOMAIN` / `CUSTOM_DOMAIN` if you use the local script).
+Custom domain: Cloud Run domain mapping + DNS at your registrar (optional `DOMAIN=…` for local `make deploy` only).
 
 **Schema updates:** commit refreshed `XSD/` → push to `main` (CI rebuild) or `make deploy` locally.
 
