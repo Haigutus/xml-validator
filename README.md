@@ -26,27 +26,12 @@ uv run python app.py
 
 Dependencies: **`pyproject.toml`** + **`uv.lock`** only.
 
-## Local containers (Podman)
-
-Helper scripts (prefer these over raw compose if snap `docker-compose` fights Podman):
+## Local (Make / Podman)
 
 ```bash
-./scripts/build.sh              # build image (XSD baked in)
-./scripts/run.sh                # run with baked XSD  → :8030
-./scripts/run.sh --host-xsd     # mount ./XSD over baked schemas
-./scripts/up.sh                 # build + run
-./scripts/up.sh --host-xsd -d   # build + run detached with host XSD
-```
-
-Or compose:
-
-```bash
-export GIT_COMMIT_COUNT=$(git rev-list --count HEAD)
-export PODMAN_COMPOSE_PROVIDER=podman-compose   # recommended
-systemctl --user start podman.socket            # if needed
-
-podman compose -f compose.yml up --build -d
-# → http://localhost:8030
+cp .env.example .env   # fill values; gitignored
+make up                # build + run
+make dev               # uv run on host
 ```
 
 ### Baked XSD vs host mount
@@ -58,19 +43,15 @@ podman compose -f compose.yml up --build -d
 
 Mounting `./XSD` **replaces** the image directory at `/app/XSD` (standard container bind-mount behaviour).
 
-## Google Cloud Run (scale-to-zero / free-tier)
+## Deploy (Cloud Run)
 
-Designed for **min-instances = 0** (pay mostly when handling requests). Cold starts are mitigated without a warm instance.
+Push to **`main`** → Actions builds and deploys via **WIF** (no keys in repo).
 
-```bash
-gcloud auth login
-gcloud config set project YOUR_PROJECT_ID
-gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com
+Set repo **Actions Variables**: `GCP_PROJECT_ID`, `GCP_REGION`, `SERVICE_NAME`, `AR_REPO`, `GCP_SERVICE_ACCOUNT`, `GCP_WORKLOAD_IDENTITY_PROVIDER`.
 
-./scripts/deploy-cloudrun.sh
-# REGION=europe-west1 SERVICE=xml-validator ./scripts/deploy-cloudrun.sh
-```
+Local (optional): `gcloud auth login`, fill `.env`, `make deploy`.
 
+GCP once: enable Run + Artifact Registry + IAM Credentials; AR docker repo; deploy SA + WIF pool/provider for this GitHub repo (`workloadIdentityUser`, AR writer, Run admin).
 ### Cold-start practices (in deploy + app)
 
 | Practice | How |
@@ -86,9 +67,9 @@ gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudb
 | gunicorn | 1 worker, 4 threads; listens ASAP |
 | Request-based CPU | Default throttling (no always-on CPU bill) |
 
-Map **xsd.cimtools.eu** in Cloud Console → Cloud Run → Domain mappings (managed TLS).
+Custom domain: Cloud Run domain mapping + DNS at your registrar (optional `DOMAIN=…` for local `make deploy` only).
 
-**Schema updates:** commit refreshed `XSD/` → push → `./scripts/deploy-cloudrun.sh` (image rebuild).
+**Schema updates:** commit refreshed `XSD/` → push to `main` (CI rebuild) or `make deploy` locally.
 
 ## XSD registry
 

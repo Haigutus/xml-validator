@@ -3,6 +3,7 @@ __pycache__/
 **/__pycache__/
 *.pyc
 .git/
+.github/
 .pytest_cache/
 .python-version
 **/*.pdf
@@ -13,4 +14,12 @@ __pycache__/
 **/*.ppt
 **/*.pptx
 
+# Local config / secrets — never bake into the image
+.env
+.env.*
+!.env.example
 gha-creds-*.json
+*.pem
+*.key
+**/service-account*.json
+**/credentials*.json
