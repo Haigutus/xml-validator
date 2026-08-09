@@ -2,8 +2,15 @@
 # Auth: Workload Identity Federation only (no SA keys).
 # Deploy gate: push to main (and workflow_dispatch on main).
 #
-# Repo variables: GCP_PROJECT_ID, GCP_SERVICE_ACCOUNT,
-#   GCP_WORKLOAD_IDENTITY_PROVIDER, GCP_REGION, AR_REPO, SERVICE_NAME
+# Required GitHub Actions Variables (Settings → Secrets and variables → Actions → Variables):
+#   GCP_PROJECT_ID
+#   GCP_SERVICE_ACCOUNT
+#   GCP_WORKLOAD_IDENTITY_PROVIDER
+#   GCP_REGION
+#   AR_REPO
+#   SERVICE_NAME
+# Optional:
+#   CUSTOM_DOMAIN   (printed after deploy only; mapping is not auto-created in CI)
 name: Build and deploy
 
 on:
@@ -32,11 +39,29 @@ jobs:
     outputs:
       image: ${{ steps.meta.outputs.image }}
     steps:
-      # Must run before google-github-actions/auth
       - name: Checkout
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
+
+      - name: Require GitHub Variables
+        run: |
+          set -euo pipefail
+          missing=0
+          for v in PROJECT_ID REGION SERVICE AR_REPO; do
+            if [[ -z "${!v}" ]]; then
+              echo "ERROR: missing GitHub Actions variable mapped to env $v"
+              missing=1
+            fi
+          done
+          if [[ -z "${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}" || -z "${{ vars.GCP_SERVICE_ACCOUNT }}" ]]; then
+            echo "ERROR: set GCP_WORKLOAD_IDENTITY_PROVIDER and GCP_SERVICE_ACCOUNT repo variables"
+            missing=1
+          fi
+          if [[ "$missing" -ne 0 ]]; then
+            echo "See README → Deploy your own / .env.example for variable names."
+            exit 1
+          fi
 
       - name: Image metadata
         id: meta
@@ -54,7 +79,6 @@ jobs:
           } >> "${GITHUB_OUTPUT}"
           echo "Building app 0.2.${count} → ${image}"
 
-      # Indirect WIF: pool → service account (no credentials_json, no keys)
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
         with:
@@ -65,7 +89,6 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v3
 
-      # Standard gcloud credential helper for Artifact Registry (uses WIF ADC)
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
 
@@ -132,4 +155,6 @@ jobs:
       - name: Deployment URL
         run: |
           echo "Live: ${{ steps.deploy.outputs.url }}"
-          echo "Custom domain (if mapped): https://xsd.cimtools.eu"
+          if [[ -n "${{ vars.CUSTOM_DOMAIN }}" ]]; then
+            echo "Custom domain (configure DNS / domain mapping separately): https://${{ vars.CUSTOM_DOMAIN }}"
+          fi

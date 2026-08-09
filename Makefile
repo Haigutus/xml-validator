@@ -7,7 +7,6 @@
 
 .PHONY: help env sync run dev build up up-host deploy logs clean update-xsds vendor-ace
 
-# Load .env if present (Make-native; does not export to recipes unless -include + export)
 ifneq (,$(wildcard .env))
   include .env
   export
@@ -18,12 +17,11 @@ LOCAL_IMAGE     ?= xml-validator:latest
 CONTAINER_NAME  ?= xml-validator
 GCP_PROJECT     ?= $(shell gcloud config get-value project 2>/dev/null)
 GCP_REGION      ?= europe-west1
-SERVICE_NAME    ?= xml-validator-cimtools
-AR_REPO         ?= xml-validator-cimtools
+SERVICE_NAME    ?= xml-validator
+AR_REPO         ?= xml-validator
 
 export GCP_PROJECT GCP_REGION SERVICE_NAME AR_REPO HOST_PORT LOCAL_IMAGE CONTAINER_NAME
 export IMAGE ?= $(LOCAL_IMAGE)
-export CONTAINER_NAME HOST_PORT
 
 help: ## Show targets
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | \
@@ -31,12 +29,12 @@ help: ## Show targets
 
 env: ## Create .env from example if missing
 	@if [[ -f .env ]]; then echo ".env already exists"; \
-	else cp .env.example .env && echo "Created .env — edit values as needed"; fi
+	else cp .env.example .env && echo "Created .env — set GCP_PROJECT and names"; fi
 
 sync: ## Install Python deps with uv
 	uv sync
 
-dev: ## Run app on host (uv) → :$(HOST_PORT) default via PORT in app is 8030
+dev: ## Run app on host (uv) → default :8030
 	uv run python app.py
 
 build: ## Build local container image (XSD baked in)
@@ -58,9 +56,11 @@ up-host: ## Build + run with host XSD mount
 	  ./scripts/run.sh --host-xsd
 
 deploy: ## Local build/push/deploy to Cloud Run (optional; prefer git push to main)
+	@test -n "$(GCP_PROJECT)" || (echo "ERROR: set GCP_PROJECT in .env or gcloud config" >&2; exit 1)
 	./scripts/deploy-cloudrun.sh
 
 logs: ## Tail Cloud Run logs
+	@test -n "$(GCP_PROJECT)" || (echo "ERROR: set GCP_PROJECT in .env" >&2; exit 1)
 	gcloud run services logs read $(SERVICE_NAME) \
 	  --project=$(GCP_PROJECT) --region=$(GCP_REGION) --limit=50
 

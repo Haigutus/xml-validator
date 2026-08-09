@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # Optional *local* build → Artifact Registry → Cloud Run.
-# Production path: push to main (GitHub Actions + WIF).
+# Production path: push to main (GitHub Actions + WIF + repo Variables).
 #
 # Prerequisites:
 #   gcloud auth login
-#   cp .env.example .env   # optional local config
+#   cp .env.example .env  # set GCP_PROJECT, SERVICE_NAME, AR_REPO, …
 #
 # Usage:
 #   ./scripts/deploy-cloudrun.sh
 #   make deploy
-#   SKIP_BUILD=1 SKIP_PUSH=1 ./scripts/deploy-cloudrun.sh   # redeploy existing tag
+#   SKIP_BUILD=1 SKIP_PUSH=1 ./scripts/deploy-cloudrun.sh
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
@@ -24,14 +24,12 @@ need() {
 }
 need gcloud
 
-NAME="${SERVICE_NAME:-xml-validator-cimtools}"
-PROJECT="${GCP_PROJECT:-$(gcloud config get-value project 2>/dev/null || true)}"
-PROJECT="${PROJECT:-$NAME}"
+PROJECT="${GCP_PROJECT:-${GCP_PROJECT_ID:-$(gcloud config get-value project 2>/dev/null || true)}}"
 REGION="${GCP_REGION:-${REGION:-europe-west1}}"
-SERVICE="${SERVICE:-$NAME}"
-REPO="${AR_REPO:-${ARTIFACT_REPO:-$NAME}}"
-IMAGE_NAME="${IMAGE_NAME:-$NAME}"
-DOMAIN="${DOMAIN:-}"
+SERVICE="${SERVICE_NAME:-${SERVICE:-xml-validator}}"
+REPO="${AR_REPO:-${ARTIFACT_REPO:-$SERVICE}}"
+IMAGE_NAME="${IMAGE_NAME:-$SERVICE}"
+DOMAIN="${DOMAIN:-${CUSTOM_DOMAIN:-}}"
 
 GIT_COMMIT_COUNT="${GIT_COMMIT_COUNT:-$(git rev-list --count HEAD 2>/dev/null || echo 0)}"
 TAG="${TAG:-$(git rev-parse --short HEAD 2>/dev/null || echo latest)}"
@@ -43,7 +41,7 @@ CONCURRENCY="${CONCURRENCY:-40}"
 TIMEOUT="${TIMEOUT:-60}"
 
 if [[ -z "$PROJECT" || "$PROJECT" == "(unset)" ]]; then
-  echo "ERROR: set GCP project in .env (GCP_PROJECT=…) or: gcloud config set project ID" >&2
+  echo "ERROR: set GCP_PROJECT in .env (see .env.example) or: gcloud config set project ID" >&2
   exit 1
 fi
 gcloud config set project "$PROJECT" >/dev/null
@@ -114,7 +112,6 @@ gcloud run deploy "$SERVICE" \
 
 URL="$(gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format='value(status.url)')"
 echo "==> Live: $URL"
-echo "    Custom domain (if mapped): https://xsd.cimtools.eu"
 
 if [[ -n "$DOMAIN" ]]; then
   echo "==> Domain mapping: $DOMAIN"

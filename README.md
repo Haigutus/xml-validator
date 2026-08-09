@@ -38,18 +38,19 @@ make dev                # host: uv run python app.py
 
 Scripts under `scripts/` still work (`./scripts/up.sh`, etc.). Prefer **Make** for day-to-day.
 
-### Local config vs secrets
+### Local config vs secrets (no cloud IDs in git)
 
-| File | In git? | Purpose |
-|------|---------|---------|
-| `.env.example` | yes | Documented keys + safe defaults |
-| `.env` | **no** | Your machine overrides (project id, ports, …) |
-| GitHub Actions **Variables** | repo settings | CI project / region / WIF provider |
-| GitHub **Secrets** / SA JSON keys | not used | Auth is **WIF** only |
+Cloud project names, service account emails, and WIF provider IDs are **not** stored in this repository. You set them per environment.
 
-**Standard rule:** never put long-lived keys or tokens in the repo or in scripts.  
-Local GCP: `gcloud auth login`. CI: Workload Identity Federation.  
-`.env` is for **non-secret config** (or values you accept on one laptop only). It is ignored by git, Docker, and Podman builds.
+| Place | In git? | Purpose |
+|-------|---------|---------|
+| `.env.example` | yes | Empty/placeholder keys only |
+| `.env` | **no** | Your local `GCP_PROJECT`, region, service/AR names |
+| GitHub **Variables** | repo settings only | Same values for CI deploy |
+| GitHub **Secrets** | optional | Prefer Variables for non-key config; never commit SA JSON keys |
+| Auth | not in repo | Local: `gcloud auth login` · CI: **WIF** only |
+
+`.env` is ignored by git, Docker, and Podman (never baked into the image).
 
 ### Baked XSD vs host mount
 
@@ -60,16 +61,49 @@ Local GCP: `gcloud auth login`. CI: Workload Identity Federation.
 
 Mounting `./XSD` **replaces** the image directory at `/app/XSD` (standard container bind-mount behaviour).
 
-## Google Cloud Run (scale-to-zero / free-tier)
+## Deploy your own (Google Cloud Run)
 
-**Production deploy:** merge/push to **`main`** → GitHub Actions builds the image (WIF) and deploys Cloud Run.
+Image is built and deployed by GitHub Actions on push to **`main`** (WIF, no SA keys in the repo).
 
-Optional **local** deploy (same free-tier flags; uses your `gcloud` user, not CI):
+### 1) GCP once
+
+Enable APIs: Cloud Run, Artifact Registry, IAM Credentials (for WIF).  
+Create an Artifact Registry **docker** repo, a deploy service account, and a **Workload Identity Pool + GitHub OIDC provider** bound so only *your* GitHub repo can impersonate that SA (`roles/iam.workloadIdentityUser`, plus AR writer + Run admin + `iam.serviceAccountUser` on the runtime SA).
+
+### 2) GitHub Actions Variables
+
+Repo → **Settings → Secrets and variables → Actions → Variables**:
+
+| Variable | Example shape (yours will differ) |
+|----------|-----------------------------------|
+| `GCP_PROJECT_ID` | your GCP project id |
+| `GCP_REGION` | e.g. `europe-west1` |
+| `SERVICE_NAME` | Cloud Run service name |
+| `AR_REPO` | Artifact Registry repository id |
+| `GCP_SERVICE_ACCOUNT` | `github-deploy@PROJECT_ID.iam.gserviceaccount.com` |
+| `GCP_WORKLOAD_IDENTITY_PROVIDER` | `projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/…/providers/…` |
+| `CUSTOM_DOMAIN` | optional; only printed after deploy |
+
+```bash
+# with gh authenticated:
+gh variable set GCP_PROJECT_ID --body "YOUR_PROJECT"
+gh variable set GCP_REGION --body "europe-west1"
+gh variable set SERVICE_NAME --body "xml-validator"
+gh variable set AR_REPO --body "xml-validator"
+gh variable set GCP_SERVICE_ACCOUNT --body "github-deploy@YOUR_PROJECT.iam.gserviceaccount.com"
+gh variable set GCP_WORKLOAD_IDENTITY_PROVIDER --body "projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/github/providers/github"
+# optional:
+# gh variable set CUSTOM_DOMAIN --body "validator.example.com"
+```
+
+Then protect `main` and push. CI fails fast if required variables are missing.
+
+### 3) Optional local deploy
 
 ```bash
 gcloud auth login
-cp .env.example .env   # set GCP_PROJECT / names if needed
-make deploy            # or ./scripts/deploy-cloudrun.sh
+cp .env.example .env   # set GCP_PROJECT, SERVICE_NAME, AR_REPO, …
+make deploy
 ```
 
 ### Cold-start practices (in deploy + app)
@@ -87,7 +121,7 @@ make deploy            # or ./scripts/deploy-cloudrun.sh
 | gunicorn | 1 worker, 4 threads; listens ASAP |
 | Request-based CPU | Default throttling (no always-on CPU bill) |
 
-Map **xsd.cimtools.eu** in Cloud Console → Cloud Run → Domain mappings (managed TLS).
+Custom domain: Cloud Run domain mapping + DNS at your registrar (set `DOMAIN` / `CUSTOM_DOMAIN` if you use the local script).
 
 **Schema updates:** commit refreshed `XSD/` → push to `main` (CI rebuild) or `make deploy` locally.
 
