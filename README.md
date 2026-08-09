@@ -26,28 +26,30 @@ uv run python app.py
 
 Dependencies: **`pyproject.toml`** + **`uv.lock`** only.
 
-## Local containers (Podman)
-
-Helper scripts (prefer these over raw compose if snap `docker-compose` fights Podman):
+## Local containers (Make / Podman)
 
 ```bash
-./scripts/build.sh              # build image (XSD baked in)
-./scripts/run.sh                # run with baked XSD  → :8030
-./scripts/run.sh --host-xsd     # mount ./XSD over baked schemas
-./scripts/up.sh                 # build + run
-./scripts/up.sh --host-xsd -d   # build + run detached with host XSD
+cp .env.example .env    # optional local config (gitignored)
+make help
+make up                 # build + run baked XSD → :8030
+make run-host-xsd       # mount ./XSD over baked schemas
+make dev                # host: uv run python app.py
 ```
 
-Or compose:
+Scripts under `scripts/` still work (`./scripts/up.sh`, etc.). Prefer **Make** for day-to-day.
 
-```bash
-export GIT_COMMIT_COUNT=$(git rev-list --count HEAD)
-export PODMAN_COMPOSE_PROVIDER=podman-compose   # recommended
-systemctl --user start podman.socket            # if needed
+### Local config vs secrets
 
-podman compose -f compose.yml up --build -d
-# → http://localhost:8030
-```
+| File | In git? | Purpose |
+|------|---------|---------|
+| `.env.example` | yes | Documented keys + safe defaults |
+| `.env` | **no** | Your machine overrides (project id, ports, …) |
+| GitHub Actions **Variables** | repo settings | CI project / region / WIF provider |
+| GitHub **Secrets** / SA JSON keys | not used | Auth is **WIF** only |
+
+**Standard rule:** never put long-lived keys or tokens in the repo or in scripts.  
+Local GCP: `gcloud auth login`. CI: Workload Identity Federation.  
+`.env` is for **non-secret config** (or values you accept on one laptop only). It is ignored by git, Docker, and Podman builds.
 
 ### Baked XSD vs host mount
 
@@ -60,15 +62,14 @@ Mounting `./XSD` **replaces** the image directory at `/app/XSD` (standard contai
 
 ## Google Cloud Run (scale-to-zero / free-tier)
 
-Designed for **min-instances = 0** (pay mostly when handling requests). Cold starts are mitigated without a warm instance.
+**Production deploy:** merge/push to **`main`** → GitHub Actions builds the image (WIF) and deploys Cloud Run.
+
+Optional **local** deploy (same free-tier flags; uses your `gcloud` user, not CI):
 
 ```bash
 gcloud auth login
-gcloud config set project YOUR_PROJECT_ID
-gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com
-
-./scripts/deploy-cloudrun.sh
-# REGION=europe-west1 SERVICE=xml-validator ./scripts/deploy-cloudrun.sh
+cp .env.example .env   # set GCP_PROJECT / names if needed
+make deploy            # or ./scripts/deploy-cloudrun.sh
 ```
 
 ### Cold-start practices (in deploy + app)
@@ -88,7 +89,7 @@ gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudb
 
 Map **xsd.cimtools.eu** in Cloud Console → Cloud Run → Domain mappings (managed TLS).
 
-**Schema updates:** commit refreshed `XSD/` → push → `./scripts/deploy-cloudrun.sh` (image rebuild).
+**Schema updates:** commit refreshed `XSD/` → push to `main` (CI rebuild) or `make deploy` locally.
 
 ## XSD registry
 

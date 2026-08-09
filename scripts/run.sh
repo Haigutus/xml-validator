@@ -9,8 +9,10 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+# shellcheck source=scripts/lib/load-env.sh
+source "$ROOT/scripts/lib/load-env.sh"
 
-IMAGE="${IMAGE:-xml-validator:latest}"
+IMAGE="${IMAGE:-${LOCAL_IMAGE:-xml-validator:latest}}"
 HOST_PORT="${HOST_PORT:-8030}"
 NAME="${CONTAINER_NAME:-xml-validator}"
 DETACH=()

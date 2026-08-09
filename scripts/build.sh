@@ -4,8 +4,10 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+# shellcheck source=scripts/lib/load-env.sh
+source "$ROOT/scripts/lib/load-env.sh"
 
-IMAGE="${1:-xml-validator:latest}"
+IMAGE="${1:-${LOCAL_IMAGE:-xml-validator:latest}}"
 export GIT_COMMIT_COUNT="${GIT_COMMIT_COUNT:-$(git rev-list --count HEAD 2>/dev/null || echo 0)}"
 
 echo "==> Building $IMAGE (GIT_COMMIT_COUNT=$GIT_COMMIT_COUNT)"

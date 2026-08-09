@@ -14,8 +14,9 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+# Python packaging dirs at repo root only (not scripts/lib)
+/lib/
+/lib64/
 parts/
 sdist/
 var/
@@ -222,4 +223,15 @@ __marimo__/
 .streamlit/secrets.toml
 
 # Ignore generated credentials from google-github-actions/auth
+gha-creds-*.json
+
+# Local env (keep .env.example tracked)
+.env.*
+!.env.example
+
+# Credentials never commit
+*.pem
+*.key
+**/service-account*.json
+**/credentials*.json
 gha-creds-*.json
