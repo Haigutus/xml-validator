@@ -1,96 +1,44 @@
 #!/usr/bin/env bash
-# Optional *local* build → Artifact Registry → Cloud Run.
-# Production path: push to main (GitHub Actions + WIF + repo Variables).
-#
-# Prerequisites:
-#   gcloud auth login
-#   cp .env.example .env  # set GCP_PROJECT, SERVICE_NAME, AR_REPO, …
-#
-# Usage:
-#   ./scripts/deploy-cloudrun.sh
-#   make deploy
-#   SKIP_BUILD=1 SKIP_PUSH=1 ./scripts/deploy-cloudrun.sh
+# Local build → AR → Cloud Run. Prefer: push to main (Actions + WIF).
+# Requires .env (see .env.example) or exported GCP_* / SERVICE_NAME / AR_REPO.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 # shellcheck source=scripts/lib/load-env.sh
 source "$ROOT/scripts/lib/load-env.sh"
 
-need() {
-  command -v "$1" >/dev/null 2>&1 || {
-    echo "ERROR: '$1' not found" >&2
-    exit 1
-  }
-}
-need gcloud
+command -v gcloud >/dev/null || { echo "need gcloud" >&2; exit 1; }
 
-PROJECT="${GCP_PROJECT:-${GCP_PROJECT_ID:-$(gcloud config get-value project 2>/dev/null || true)}}"
-REGION="${GCP_REGION:-${REGION:-europe-west1}}"
-SERVICE="${SERVICE_NAME:-${SERVICE:-xml-validator}}"
-REPO="${AR_REPO:-${ARTIFACT_REPO:-$SERVICE}}"
+PROJECT="${GCP_PROJECT:-${GCP_PROJECT_ID:-}}"
+REGION="${GCP_REGION:?set GCP_REGION}"
+SERVICE="${SERVICE_NAME:?set SERVICE_NAME}"
+REPO="${AR_REPO:?set AR_REPO}"
 IMAGE_NAME="${IMAGE_NAME:-$SERVICE}"
-DOMAIN="${DOMAIN:-${CUSTOM_DOMAIN:-}}"
-
-GIT_COMMIT_COUNT="${GIT_COMMIT_COUNT:-$(git rev-list --count HEAD 2>/dev/null || echo 0)}"
 TAG="${TAG:-$(git rev-parse --short HEAD 2>/dev/null || echo latest)}"
+COUNT="${GIT_COMMIT_COUNT:-$(git rev-list --count HEAD 2>/dev/null || echo 0)}"
 
-MEMORY="${MEMORY:-512Mi}"
-CPU="${CPU:-1}"
-MAX_INSTANCES="${MAX_INSTANCES:-2}"
-CONCURRENCY="${CONCURRENCY:-40}"
-TIMEOUT="${TIMEOUT:-60}"
-
-if [[ -z "$PROJECT" || "$PROJECT" == "(unset)" ]]; then
-  echo "ERROR: set GCP_PROJECT in .env (see .env.example) or: gcloud config set project ID" >&2
-  exit 1
-fi
+[[ -n "$PROJECT" ]] || { echo "set GCP_PROJECT" >&2; exit 1; }
 gcloud config set project "$PROJECT" >/dev/null
 
 IMAGE="${REGION}-docker.pkg.dev/${PROJECT}/${REPO}/${IMAGE_NAME}:${TAG}"
 IMAGE_LATEST="${REGION}-docker.pkg.dev/${PROJECT}/${REPO}/${IMAGE_NAME}:latest"
 
-if command -v podman >/dev/null 2>&1; then
-  CTR=podman
-elif command -v docker >/dev/null 2>&1; then
-  CTR=docker
-else
-  echo "ERROR: need podman or docker for local image build" >&2
-  exit 1
+if command -v podman >/dev/null; then CTR=podman
+elif command -v docker >/dev/null; then CTR=docker
+else echo "need podman or docker" >&2; exit 1
 fi
 
-echo "==> Account:  $(gcloud config get-value account)"
-echo "==> Project:  $PROJECT"
-echo "==> Region:   $REGION"
-echo "==> Service:  $SERVICE"
-echo "==> Builder:  $CTR"
-echo "==> Image:    $IMAGE"
-echo "==> Version:  0.2.$GIT_COMMIT_COUNT"
-echo "==> Profile:  min=0 cpu-boost memory=$MEMORY concurrency=$CONCURRENCY"
-echo "    (Prefer: git push to main → GitHub Actions WIF deploy)"
-
 if [[ "${SKIP_BUILD:-0}" != "1" ]]; then
-  echo "==> Build ($CTR)"
-  "$CTR" build \
-    -f Containerfile \
-    --build-arg "GIT_COMMIT_COUNT=${GIT_COMMIT_COUNT}" \
-    -t "$IMAGE" \
-    -t "$IMAGE_LATEST" \
-    .
+  "$CTR" build -f Containerfile --build-arg "GIT_COMMIT_COUNT=$COUNT" -t "$IMAGE" -t "$IMAGE_LATEST" .
 fi
 
 if [[ "${SKIP_PUSH:-0}" != "1" ]]; then
-  echo "==> Registry auth: ${REGION}-docker.pkg.dev"
   gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
-  if [[ "$CTR" == "podman" ]]; then
-    gcloud auth print-access-token | podman login -u oauth2accesstoken --password-stdin \
-      "${REGION}-docker.pkg.dev"
-  fi
-  echo "==> Push $IMAGE"
+  [[ "$CTR" == podman ]] && gcloud auth print-access-token | podman login -u oauth2accesstoken --password-stdin "${REGION}-docker.pkg.dev"
   "$CTR" push "$IMAGE"
-  "$CTR" push "$IMAGE_LATEST" || echo "    (latest push optional)"
+  "$CTR" push "$IMAGE_LATEST" || true
 fi
 
-echo "==> Deploy Cloud Run"
 gcloud run deploy "$SERVICE" \
   --project="$PROJECT" \
   --image "$IMAGE" \
@@ -98,26 +46,16 @@ gcloud run deploy "$SERVICE" \
   --platform managed \
   --allow-unauthenticated \
   --port 8080 \
-  --memory "$MEMORY" \
-  --cpu "$CPU" \
+  --memory "${MEMORY:-512Mi}" \
+  --cpu "${CPU:-1}" \
   --cpu-boost \
   --min-instances 0 \
-  --max-instances "$MAX_INSTANCES" \
-  --concurrency "$CONCURRENCY" \
-  --timeout "$TIMEOUT" \
+  --max-instances "${MAX_INSTANCES:-2}" \
+  --concurrency "${CONCURRENCY:-40}" \
+  --timeout "${TIMEOUT:-60}" \
   --execution-environment gen1 \
   --set-env-vars "XSD_DIR=/app/XSD,MAX_XML_BYTES=10485760,PYTHONDONTWRITEBYTECODE=1,PYTHONUNBUFFERED=1" \
   --startup-probe="httpGet.path=/healthz,httpGet.port=8080,initialDelaySeconds=0,timeoutSeconds=2,periodSeconds=3,failureThreshold=15" \
   --liveness-probe="httpGet.path=/healthz,httpGet.port=8080,timeoutSeconds=3,periodSeconds=30,failureThreshold=3"
 
-URL="$(gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format='value(status.url)')"
-echo "==> Live: $URL"
-
-if [[ -n "$DOMAIN" ]]; then
-  echo "==> Domain mapping: $DOMAIN"
-  if ! gcloud beta run domain-mappings describe --domain="$DOMAIN" --region="$REGION" --project="$PROJECT" >/dev/null 2>&1; then
-    gcloud beta run domain-mappings create \
-      --service="$SERVICE" --domain="$DOMAIN" --region="$REGION" --project="$PROJECT"
-  fi
-  gcloud beta run domain-mappings describe --domain="$DOMAIN" --region="$REGION" --project="$PROJECT"
-fi
+gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format='value(status.url)'

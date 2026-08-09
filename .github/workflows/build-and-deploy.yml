@@ -1,14 +1,6 @@
-# Build image → Artifact Registry → deploy Cloud Run (linked jobs).
-# Auth: Workload Identity Federation only (no SA keys).
-# Deploy gate: push to main (and workflow_dispatch on main).
-#
-# Required GitHub Actions Variables (Settings → Secrets and variables → Actions → Variables):
-#   GCP_PROJECT_ID
-#   GCP_SERVICE_ACCOUNT
-#   GCP_WORKLOAD_IDENTITY_PROVIDER
-#   GCP_REGION
-#   AR_REPO
-#   SERVICE_NAME
+# Push to main → build image → deploy Cloud Run (WIF).
+# Variables: GCP_PROJECT_ID, GCP_REGION, SERVICE_NAME, AR_REPO,
+#            GCP_SERVICE_ACCOUNT, GCP_WORKLOAD_IDENTITY_PROVIDER
 name: Build and deploy
 
 on:
@@ -32,69 +24,36 @@ env:
 
 jobs:
   build:
-    name: Build and push image
     runs-on: ubuntu-latest
     outputs:
       image: ${{ steps.meta.outputs.image }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - name: Require GitHub Variables
+      - id: meta
         run: |
-          set -euo pipefail
-          missing=0
-          for v in PROJECT_ID REGION SERVICE AR_REPO; do
-            if [[ -z "${!v}" ]]; then
-              echo "ERROR: missing GitHub Actions variable mapped to env $v"
-              missing=1
-            fi
-          done
-          if [[ -z "${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}" || -z "${{ vars.GCP_SERVICE_ACCOUNT }}" ]]; then
-            echo "ERROR: set GCP_WORKLOAD_IDENTITY_PROVIDER and GCP_SERVICE_ACCOUNT repo variables"
-            missing=1
-          fi
-          if [[ "$missing" -ne 0 ]]; then
-            echo "See README → Deploy your own / .env.example for variable names."
-            exit 1
-          fi
+          sha=$(git rev-parse --short HEAD)
+          count=$(git rev-list --count HEAD)
+          base=${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/${SERVICE}
+          echo "image=${base}:${sha}" >> "$GITHUB_OUTPUT"
+          echo "image_latest=${base}:latest" >> "$GITHUB_OUTPUT"
+          echo "git_commit_count=${count}" >> "$GITHUB_OUTPUT"
 
-      - name: Image metadata
-        id: meta
-        run: |
-          set -euo pipefail
-          short_sha="$(git rev-parse --short HEAD)"
-          count="$(git rev-list --count HEAD)"
-          image="${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/${SERVICE}:${short_sha}"
-          image_latest="${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/${SERVICE}:latest"
-          {
-            echo "short_sha=${short_sha}"
-            echo "git_commit_count=${count}"
-            echo "image=${image}"
-            echo "image_latest=${image_latest}"
-          } >> "${GITHUB_OUTPUT}"
-          echo "Building app 0.2.${count} → ${image}"
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v3
+      - uses: google-github-actions/auth@v3
         with:
           project_id: ${{ vars.GCP_PROJECT_ID }}
           workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v3
+      - uses: google-github-actions/setup-gcloud@v3
 
-      - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+      - run: gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+      - uses: docker/setup-buildx-action@v4
 
-      - name: Build and push
-        uses: docker/build-push-action@v7
+      - uses: docker/build-push-action@v7
         with:
           context: .
           file: Containerfile
@@ -102,29 +61,24 @@ jobs:
           tags: |
             ${{ steps.meta.outputs.image }}
             ${{ steps.meta.outputs.image_latest }}
-          build-args: |
-            GIT_COMMIT_COUNT=${{ steps.meta.outputs.git_commit_count }}
+          build-args: GIT_COMMIT_COUNT=${{ steps.meta.outputs.git_commit_count }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
           provenance: false
 
   deploy:
-    name: Deploy Cloud Run
     needs: build
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v3
+      - uses: google-github-actions/auth@v3
         with:
           project_id: ${{ vars.GCP_PROJECT_ID }}
           workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
-      - name: Deploy to Cloud Run
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@v3
+      - uses: google-github-actions/deploy-cloudrun@v3
         with:
           project_id: ${{ vars.GCP_PROJECT_ID }}
           service: ${{ vars.SERVICE_NAME }}
@@ -149,6 +103,3 @@ jobs:
             --execution-environment=gen1
             --startup-probe=httpGet.path=/healthz,httpGet.port=8080,initialDelaySeconds=0,timeoutSeconds=2,periodSeconds=3,failureThreshold=15
             --liveness-probe=httpGet.path=/healthz,httpGet.port=8080,timeoutSeconds=3,periodSeconds=30,failureThreshold=3
-
-      - name: Deployment URL
-        run: echo "Live: ${{ steps.deploy.outputs.url }}"

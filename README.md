@@ -26,31 +26,13 @@ uv run python app.py
 
 Dependencies: **`pyproject.toml`** + **`uv.lock`** only.
 
-## Local containers (Make / Podman)
+## Local (Make / Podman)
 
 ```bash
-cp .env.example .env    # optional local config (gitignored)
-make help
-make up                 # build + run baked XSD → :8030
-make run-host-xsd       # mount ./XSD over baked schemas
-make dev                # host: uv run python app.py
+cp .env.example .env   # fill values; gitignored
+make up                # build + run
+make dev               # uv run on host
 ```
-
-Scripts under `scripts/` still work (`./scripts/up.sh`, etc.). Prefer **Make** for day-to-day.
-
-### Local config vs secrets (no cloud IDs in git)
-
-Cloud project names, service account emails, and WIF provider IDs are **not** stored in this repository. You set them per environment.
-
-| Place | In git? | Purpose |
-|-------|---------|---------|
-| `.env.example` | yes | Empty/placeholder keys only |
-| `.env` | **no** | Your local `GCP_PROJECT`, region, service/AR names |
-| GitHub **Variables** | repo settings only | Same values for CI deploy |
-| GitHub **Secrets** | optional | Prefer Variables for non-key config; never commit SA JSON keys |
-| Auth | not in repo | Local: `gcloud auth login` · CI: **WIF** only |
-
-`.env` is ignored by git, Docker, and Podman (never baked into the image).
 
 ### Baked XSD vs host mount
 
@@ -61,48 +43,15 @@ Cloud project names, service account emails, and WIF provider IDs are **not** st
 
 Mounting `./XSD` **replaces** the image directory at `/app/XSD` (standard container bind-mount behaviour).
 
-## Deploy your own (Google Cloud Run)
+## Deploy (Cloud Run)
 
-Image is built and deployed by GitHub Actions on push to **`main`** (WIF, no SA keys in the repo).
+Push to **`main`** → Actions builds and deploys via **WIF** (no keys in repo).
 
-### 1) GCP once
+Set repo **Actions Variables**: `GCP_PROJECT_ID`, `GCP_REGION`, `SERVICE_NAME`, `AR_REPO`, `GCP_SERVICE_ACCOUNT`, `GCP_WORKLOAD_IDENTITY_PROVIDER`.
 
-Enable APIs: Cloud Run, Artifact Registry, IAM Credentials (for WIF).  
-Create an Artifact Registry **docker** repo, a deploy service account, and a **Workload Identity Pool + GitHub OIDC provider** bound so only *your* GitHub repo can impersonate that SA (`roles/iam.workloadIdentityUser`, plus AR writer + Run admin + `iam.serviceAccountUser` on the runtime SA).
+Local (optional): `gcloud auth login`, fill `.env`, `make deploy`.
 
-### 2) GitHub Actions Variables
-
-Repo → **Settings → Secrets and variables → Actions → Variables**:
-
-| Variable | Example shape (yours will differ) |
-|----------|-----------------------------------|
-| `GCP_PROJECT_ID` | your GCP project id |
-| `GCP_REGION` | e.g. `europe-west1` |
-| `SERVICE_NAME` | Cloud Run service name |
-| `AR_REPO` | Artifact Registry repository id |
-| `GCP_SERVICE_ACCOUNT` | `github-deploy@PROJECT_ID.iam.gserviceaccount.com` |
-| `GCP_WORKLOAD_IDENTITY_PROVIDER` | `projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/…/providers/…` |
-
-```bash
-# with gh authenticated:
-gh variable set GCP_PROJECT_ID --body "YOUR_PROJECT"
-gh variable set GCP_REGION --body "europe-west1"
-gh variable set SERVICE_NAME --body "xml-validator"
-gh variable set AR_REPO --body "xml-validator"
-gh variable set GCP_SERVICE_ACCOUNT --body "github-deploy@YOUR_PROJECT.iam.gserviceaccount.com"
-gh variable set GCP_WORKLOAD_IDENTITY_PROVIDER --body "projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/github/providers/github"
-```
-
-Then protect `main` and push. CI fails fast if required variables are missing.
-
-### 3) Optional local deploy
-
-```bash
-gcloud auth login
-cp .env.example .env   # set GCP_PROJECT, SERVICE_NAME, AR_REPO, …
-make deploy
-```
-
+GCP once: enable Run + Artifact Registry + IAM Credentials; AR docker repo; deploy SA + WIF pool/provider for this GitHub repo (`workloadIdentityUser`, AR writer, Run admin).
 ### Cold-start practices (in deploy + app)
 
 | Practice | How |
