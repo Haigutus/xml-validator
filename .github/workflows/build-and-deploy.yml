@@ -1,9 +1,8 @@
-# Build container image → Artifact Registry → deploy Cloud Run.
-# Linked jobs: deploy only runs after a successful build of this commit.
+# Build image → Artifact Registry → deploy Cloud Run (linked jobs).
+# Auth: Workload Identity Federation (no SA keys).
+# Trigger: push to main + manual workflow_dispatch.
 #
-# Trigger: push to main (and manual dispatch).
-# Auth: Workload Identity Federation (no JSON keys).
-# GCP vars (repo Actions variables): GCP_PROJECT_ID, GCP_SERVICE_ACCOUNT,
+# Repo variables: GCP_PROJECT_ID, GCP_SERVICE_ACCOUNT,
 #   GCP_WORKLOAD_IDENTITY_PROVIDER, GCP_REGION, AR_REPO, SERVICE_NAME
 name: Build and deploy
 
@@ -25,12 +24,6 @@ env:
   REGION: ${{ vars.GCP_REGION }}
   SERVICE: ${{ vars.SERVICE_NAME }}
   AR_REPO: ${{ vars.AR_REPO }}
-  # Free-tier / scale-to-zero profile (match local deploy script)
-  MEMORY: 512Mi
-  CPU: "1"
-  MAX_INSTANCES: "2"
-  CONCURRENCY: "40"
-  TIMEOUT: "60"
 
 jobs:
   build:
@@ -38,10 +31,10 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       image: ${{ steps.meta.outputs.image }}
-      short_sha: ${{ steps.meta.outputs.short_sha }}
     steps:
+      # checkout must run before google-github-actions/auth (credentials land in workspace)
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -49,41 +42,40 @@ jobs:
         id: meta
         run: |
           set -euo pipefail
-          SHORT_SHA="$(git rev-parse --short HEAD)"
-          COUNT="$(git rev-list --count HEAD)"
-          IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/${SERVICE}:${SHORT_SHA}"
+          short_sha="$(git rev-parse --short HEAD)"
+          count="$(git rev-list --count HEAD)"
+          image="${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/${SERVICE}:${short_sha}"
+          image_latest="${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/${SERVICE}:latest"
           {
-            echo "short_sha=${SHORT_SHA}"
-            echo "git_commit_count=${COUNT}"
-            echo "image=${IMAGE}"
-            echo "image_latest=${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/${SERVICE}:latest"
-          } >> "$GITHUB_OUTPUT"
-          echo "Building app 0.2.${COUNT} → ${IMAGE}"
+            echo "short_sha=${short_sha}"
+            echo "git_commit_count=${count}"
+            echo "image=${image}"
+            echo "image_latest=${image_latest}"
+          } >> "${GITHUB_OUTPUT}"
+          echo "Building app 0.2.${count} → ${image}"
 
-      - name: Authenticate to Google Cloud (WIF)
+      - name: Authenticate to Google Cloud
         id: auth
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
           workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
-          # Access token for docker/login-action (avoids buildx + gcloud docker-helper issues)
+          # OAuth access token for registry login (official auth output path)
           token_format: access_token
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-
       - name: Log in to Artifact Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGION }}-docker.pkg.dev
           username: oauth2accesstoken
           password: ${{ steps.auth.outputs.access_token }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Build and push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: Containerfile
@@ -96,6 +88,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
+          provenance: false
 
   deploy:
     name: Deploy Cloud Run
@@ -103,43 +96,43 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - name: Authenticate to Google Cloud (WIF)
-        uses: google-github-actions/auth@v2
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
         with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
           workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          service: ${{ vars.SERVICE_NAME }}
+          region: ${{ vars.GCP_REGION }}
+          image: ${{ needs.build.outputs.image }}
+          env_vars: |-
+            XSD_DIR=/app/XSD
+            MAX_XML_BYTES=10485760
+            PYTHONDONTWRITEBYTECODE=1
+            PYTHONUNBUFFERED=1
+          env_vars_update_strategy: overwrite
+          timeout: 60s
+          # Free-tier / cold-start profile (flags not exposed as first-class inputs)
+          flags: >-
+            --allow-unauthenticated
+            --port=8080
+            --memory=512Mi
+            --cpu=1
+            --cpu-boost
+            --min-instances=0
+            --max-instances=2
+            --concurrency=40
+            --execution-environment=gen1
+            --startup-probe=httpGet.path=/healthz,httpGet.port=8080,initialDelaySeconds=0,timeoutSeconds=2,periodSeconds=3,failureThreshold=15
+            --liveness-probe=httpGet.path=/healthz,httpGet.port=8080,timeoutSeconds=3,periodSeconds=30,failureThreshold=3
 
-      - name: Deploy
-        env:
-          IMAGE: ${{ needs.build.outputs.image }}
+      - name: Deployment URL
         run: |
-          set -euo pipefail
-          echo "Deploying ${IMAGE} → ${SERVICE} (${REGION})"
-          gcloud run deploy "${SERVICE}" \
-            --project="${PROJECT_ID}" \
-            --image="${IMAGE}" \
-            --region="${REGION}" \
-            --platform=managed \
-            --allow-unauthenticated \
-            --port=8080 \
-            --memory="${MEMORY}" \
-            --cpu="${CPU}" \
-            --cpu-boost \
-            --min-instances=0 \
-            --max-instances="${MAX_INSTANCES}" \
-            --concurrency="${CONCURRENCY}" \
-            --timeout="${TIMEOUT}" \
-            --execution-environment=gen1 \
-            --set-env-vars="XSD_DIR=/app/XSD,MAX_XML_BYTES=10485760,PYTHONDONTWRITEBYTECODE=1,PYTHONUNBUFFERED=1" \
-            --startup-probe="httpGet.path=/healthz,httpGet.port=8080,initialDelaySeconds=0,timeoutSeconds=2,periodSeconds=3,failureThreshold=15" \
-            --liveness-probe="httpGet.path=/healthz,httpGet.port=8080,timeoutSeconds=3,periodSeconds=30,failureThreshold=3"
-
-          URL="$(gcloud run services describe "${SERVICE}" \
-            --project="${PROJECT_ID}" \
-            --region="${REGION}" \
-            --format='value(status.url)')"
-          echo "Live: ${URL}"
+          echo "Live: ${{ steps.deploy.outputs.url }}"
           echo "Custom domain (if mapped): https://xsd.cimtools.eu"
