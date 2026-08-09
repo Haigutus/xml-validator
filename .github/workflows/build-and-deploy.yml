@@ -1,0 +1,138 @@
+# Build container image → Artifact Registry → deploy Cloud Run.
+# Linked jobs: deploy only runs after a successful build of this commit.
+#
+# Trigger: push to main (and manual dispatch).
+# Auth: Workload Identity Federation (no JSON keys).
+# GCP vars (repo Actions variables): GCP_PROJECT_ID, GCP_SERVICE_ACCOUNT,
+#   GCP_WORKLOAD_IDENTITY_PROVIDER, GCP_REGION, AR_REPO, SERVICE_NAME
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  REGION: ${{ vars.GCP_REGION }}
+  SERVICE: ${{ vars.SERVICE_NAME }}
+  AR_REPO: ${{ vars.AR_REPO }}
+  # Free-tier / scale-to-zero profile (match local deploy script)
+  MEMORY: 512Mi
+  CPU: "1"
+  MAX_INSTANCES: "2"
+  CONCURRENCY: "40"
+  TIMEOUT: "60"
+
+jobs:
+  build:
+    name: Build and push image
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+      short_sha: ${{ steps.meta.outputs.short_sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Image metadata
+        id: meta
+        run: |
+          set -euo pipefail
+          SHORT_SHA="$(git rev-parse --short HEAD)"
+          COUNT="$(git rev-list --count HEAD)"
+          IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/${SERVICE}:${SHORT_SHA}"
+          {
+            echo "short_sha=${SHORT_SHA}"
+            echo "git_commit_count=${COUNT}"
+            echo "image=${IMAGE}"
+            echo "image_latest=${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/${SERVICE}:latest"
+          } >> "$GITHUB_OUTPUT"
+          echo "Building app 0.2.${COUNT} → ${IMAGE}"
+
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Containerfile
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image }}
+            ${{ steps.meta.outputs.image_latest }}
+          build-args: |
+            GIT_COMMIT_COUNT=${{ steps.meta.outputs.git_commit_count }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+  deploy:
+    name: Deploy Cloud Run
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy
+        env:
+          IMAGE: ${{ needs.build.outputs.image }}
+        run: |
+          set -euo pipefail
+          echo "Deploying ${IMAGE} → ${SERVICE} (${REGION})"
+          gcloud run deploy "${SERVICE}" \
+            --project="${PROJECT_ID}" \
+            --image="${IMAGE}" \
+            --region="${REGION}" \
+            --platform=managed \
+            --allow-unauthenticated \
+            --port=8080 \
+            --memory="${MEMORY}" \
+            --cpu="${CPU}" \
+            --cpu-boost \
+            --min-instances=0 \
+            --max-instances="${MAX_INSTANCES}" \
+            --concurrency="${CONCURRENCY}" \
+            --timeout="${TIMEOUT}" \
+            --execution-environment=gen1 \
+            --set-env-vars="XSD_DIR=/app/XSD,MAX_XML_BYTES=10485760,PYTHONDONTWRITEBYTECODE=1,PYTHONUNBUFFERED=1" \
+            --startup-probe="httpGet.path=/healthz,httpGet.port=8080,initialDelaySeconds=0,timeoutSeconds=2,periodSeconds=3,failureThreshold=15" \
+            --liveness-probe="httpGet.path=/healthz,httpGet.port=8080,timeoutSeconds=3,periodSeconds=30,failureThreshold=3"
+
+          URL="$(gcloud run services describe "${SERVICE}" \
+            --project="${PROJECT_ID}" \
+            --region="${REGION}" \
+            --format='value(status.url)')"
+          echo "Live: ${URL}"
+          echo "Custom domain (if mapped): https://xsd.cimtools.eu"
