@@ -139,6 +139,7 @@ app.layout = html.Div(
                             className="app-version",
                             title="0.2.<git commit count>",
                         ),
+                        html.Span("—", id="status-badge", className="status-badge"),
                     ],
                 ),
                 html.A(
@@ -157,9 +158,16 @@ app.layout = html.Div(
                     className="xml-editor",
                     children=[html.Div(id="xml-ace")],
                 ),
-                html.Div(
-                    className="log-editor",
-                    children=[html.Div(id="log-ace")],
+                html.Details(
+                    className="log-panel",
+                    open=False,
+                    children=[
+                        html.Summary("Detailed log"),
+                        html.Div(
+                            className="log-editor",
+                            children=[html.Div(id="log-ace")],
+                        ),
+                    ],
                 ),
             ],
         ),
@@ -216,17 +224,20 @@ def _annotations(errors):
 @callback(
     Output("log-store", "data"),
     Output("ann-store", "data"),
+    Output("status-badge", "children"),
+    Output("status-badge", "className"),
     Input("xml-store", "data"),
 )
 def on_xml(content):
-    if content is None or content == "":
-        return "", []
-    if not str(content).strip():
-        return "", []
-
+    if content is None or not str(content).strip():
+        return "", [], "—", "status-badge"
     result = validate(content)
-    log = "\n".join(result["status_lines"])
-    return log, _annotations(result["errors"])
+    n = len(result["errors"])
+    ok = result["ok"]
+    xsd = (result.get("xsd_used") or "").strip()
+    badge = ("OK" if ok else f"NOK · {n}") + (f" · {xsd}" if xsd else "")
+    cls = "status-badge status-ok" if ok else "status-badge status-nok"
+    return "\n".join(result["status_lines"]), _annotations(result["errors"]), badge, cls
 
 
 def main():

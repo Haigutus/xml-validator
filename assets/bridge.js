@@ -139,7 +139,7 @@
         if (window.dash_clientside && dash_clientside.set_props) {
           dash_clientside.set_props("xml-store", { data: v });
         }
-      }, 400);
+      }, 200);
     });
 
     setTimeout(function () {
@@ -266,4 +266,20 @@
     if (xmlEditor) xmlEditor.resize(true);
     if (logEditor) logEditor.resize(true);
   });
+
+  // Collapsible log (<details.log-panel>): Ace needs resize after open/close
+  document.addEventListener(
+    "toggle",
+    function (e) {
+      if (!e.target || !e.target.classList || !e.target.classList.contains("log-panel")) {
+        return;
+      }
+      setTimeout(function () {
+        if (logEditor) logEditor.resize(true);
+        if (xmlEditor) xmlEditor.resize(true);
+      }, 0);
+    },
+    true
+  );
 })();
+

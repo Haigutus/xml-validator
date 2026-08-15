@@ -44,6 +44,8 @@ html, body {
   align-items: baseline;
   gap: 8px;
   min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
 }
 
 .header h1 {
@@ -61,6 +63,22 @@ html, body {
   letter-spacing: 0.02em;
   user-select: all;
 }
+
+.status-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  padding: 1px 7px;
+  border-radius: 3px;
+  color: #888;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: min(70vw, 48rem);
+}
+.status-ok { background: #1e3d1e; color: #8d8; }
+.status-nok { background: #3d1e1e; color: #f88; }
 
 .header a {
   display: flex;
@@ -94,12 +112,28 @@ html, body {
   position: relative;
 }
 
-.log-editor {
-  flex: 0 0 20vh;
+/* Collapsible log panel */
+.log-panel {
+  flex: 0 0 auto;
+  border-top: 1px solid #333;
+  min-height: 0;
+}
+.log-panel > summary {
+  cursor: pointer;
+  padding: 4px 12px;
+  font-size: 0.7rem;
+  color: #aaa;
+  user-select: none;
+}
+.log-panel[open] .log-editor {
+  height: 20vh;
   min-height: 100px;
   max-height: 30vh;
-  border-top: 1px solid #333;
   position: relative;
+  border-top: 1px solid #222;
+}
+.log-panel:not([open]) .log-editor {
+  display: none;
 }
 
 /* Only the Ace mount fills its shell — not the shell itself */
